@@ -14,7 +14,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <TrimmerRootDescriptor Include="TrimmerRoots.xml" />
+        <TrimmerRootDescriptor Include="Resources/TrimmerRoots.xml" />
     </ItemGroup>
 
     <ItemGroup>
