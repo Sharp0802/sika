@@ -2,5 +2,6 @@
 <linker>
     <assembly fullname="blogman">
         <type fullname="BlogMan.Models.Project" preserve="all" />
+        <type fullname="BlogMan.Models.PostFrontMatter" preserve="all" />
     </assembly>
 </linker>
