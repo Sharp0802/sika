@@ -130,6 +130,7 @@ public static class Initializer
                     using (var file = File.OpenWrite($"{DateTime.Now:yyyyMMdd}_{name}.md"))
                     using (var writer = new StreamWriter(file, Encoding.UTF8))
                     {
+                        writer.WriteLine("---");
                         new Serializer().Serialize(
                             writer,
                             new PostFrontMatter(
@@ -138,6 +139,9 @@ public static class Initializer
                                 name,
                                 new[] { DateTime.Now },
                                 Array.Empty<string>()));
+                        writer.WriteLine("---");
+                        writer.WriteLine();
+                        writer.WriteLine($"# {name}");
                     }
 
                     break;

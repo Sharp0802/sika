@@ -15,10 +15,21 @@ public partial class PostFrontMatter : IValidatableObject
     
     [Required]
     public string Title { get; set; }
+
+    [Required, 
+     Obsolete($"Do NOT use this code directly. Use {nameof(Timestamps)} instead."), 
+     YamlMember(Alias = nameof(Timestamps))] 
+    public string[] RawTimestamps { get; set; } = null!;
     
-    [Required]
-    public DateTime[] Timestamps { get; set; }
-    
+    [YamlIgnore]
+    public DateTime[] Timestamps
+    {
+#pragma warning disable CS0618
+        get => RawTimestamps.Select(t => DateTime.ParseExact(t, "yyyy-MM-dd", null)).ToArray();
+        set => RawTimestamps = value.Select(t => t.ToString("yyyy-MM-dd")).ToArray();
+#pragma warning restore CS0618
+    }
+
     [Required]
     public string[] Topic { get; set; }
 
@@ -37,7 +48,9 @@ public partial class PostFrontMatter : IValidatableObject
         list.AddRange(this.ValidateProperty(nameof(LCID)));
         list.AddRange(this.ValidateProperty(nameof(Layout)));
         list.AddRange(this.ValidateProperty(nameof(Title)));
-        list.AddRange(this.ValidateProperty(nameof(Timestamps)));
+#pragma warning disable CS0618
+        list.AddRange(this.ValidateProperty(nameof(RawTimestamps)));
+#pragma warning restore CS0618
         list.AddRange(this.ValidateProperty(nameof(Topic)));
         return list;
     }
