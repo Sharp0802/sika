@@ -8,11 +8,6 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <PublishAot>true</PublishAot>
-        <StripSymbols>true</StripSymbols>
-    </PropertyGroup>
-
     <ItemGroup>
         <TrimmerRootDescriptor Include="Resources/TrimmerRoots.xml" />
     </ItemGroup>
