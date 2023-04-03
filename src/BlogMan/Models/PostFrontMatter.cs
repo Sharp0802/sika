@@ -1,20 +1,44 @@
+using System.ComponentModel.DataAnnotations;
+using BlogMan.Components;
 using YamlDotNet.Serialization;
 
 namespace BlogMan.Models;
 
 [Serializable, YamlSerializable]
-public class PostFrontMatter
+public partial class PostFrontMatter : IValidatableObject
 {
-    public string? Layout { get; set; }
-    public string? Title { get; set; }
-    public DateTime[]? Date { get; set; }
-    public string[]? Topic { get; set; }
+    [Required]
+    public string LCID { get; set; }
+    
+    [Required]
+    public string Layout { get; set; }
+    
+    [Required]
+    public string Title { get; set; }
+    
+    [Required]
+    public DateTime[] Timestamps { get; set; }
+    
+    [Required]
+    public string[] Topic { get; set; }
 
-    public PostFrontMatter(string layout, string title, DateTime[] date, string[] topic)
+    public PostFrontMatter(string lcid, string layout, string title, DateTime[] timestamps, string[] topic)
     {
+        LCID = lcid;
         Layout = layout;
         Title = title;
-        Date = date;
+        Timestamps = timestamps;
         Topic = topic;
+    }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext _)
+    {
+        var list = new List<ValidationResult>();
+        list.AddRange(this.ValidateProperty(nameof(LCID)));
+        list.AddRange(this.ValidateProperty(nameof(Layout)));
+        list.AddRange(this.ValidateProperty(nameof(Title)));
+        list.AddRange(this.ValidateProperty(nameof(Timestamps)));
+        list.AddRange(this.ValidateProperty(nameof(Topic)));
+        return list;
     }
 }
