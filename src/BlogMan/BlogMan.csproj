@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="../BlogMan.Generator/BlogMan.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <PackageReference Include="AngleSharp" Version="1.0.1" />
         <PackageReference Include="Markdig" Version="0.31.0" />
         <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />

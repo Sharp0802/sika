@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlogMan", "BlogMan\BlogMan.csproj", "{2D32CF97-B273-4350-B43D-12594A30EA35}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlogMan.Generator", "BlogMan.Generator\BlogMan.Generator.csproj", "{815C3F5F-8B43-496B-BE37-B7680C4FB58E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -24,5 +26,13 @@ Global
 		{2D32CF97-B273-4350-B43D-12594A30EA35}.Debug|x64.Build.0 = Debug|x64
 		{2D32CF97-B273-4350-B43D-12594A30EA35}.Release|x64.ActiveCfg = Release|x64
 		{2D32CF97-B273-4350-B43D-12594A30EA35}.Release|x64.Build.0 = Release|x64
+		{815C3F5F-8B43-496B-BE37-B7680C4FB58E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{815C3F5F-8B43-496B-BE37-B7680C4FB58E}.Debug|x86.Build.0 = Debug|Any CPU
+		{815C3F5F-8B43-496B-BE37-B7680C4FB58E}.Release|x86.ActiveCfg = Release|Any CPU
+		{815C3F5F-8B43-496B-BE37-B7680C4FB58E}.Release|x86.Build.0 = Release|Any CPU
+		{815C3F5F-8B43-496B-BE37-B7680C4FB58E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{815C3F5F-8B43-496B-BE37-B7680C4FB58E}.Debug|x64.Build.0 = Debug|Any CPU
+		{815C3F5F-8B43-496B-BE37-B7680C4FB58E}.Release|x64.ActiveCfg = Release|Any CPU
+		{815C3F5F-8B43-496B-BE37-B7680C4FB58E}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
