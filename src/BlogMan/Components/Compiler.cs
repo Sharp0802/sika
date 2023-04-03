@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text;
 using BlogMan.Models;
 using Markdig;
@@ -16,43 +15,12 @@ public class Compiler
         .UseYamlFrontMatter()
         .Build();
 
-    public static (int Total, int Success) Compile(Project proj)
+    public static bool Compile(Project proj)
     {
-        if (proj.ApiVersion is null)
-        {
-            Logger.Log(LogLevel.WARN, "Cannot retrieve the api version");
-        }
-        else if (proj.ApiVersion != Assembly.GetExecutingAssembly().GetName().Version)
-        {
-            Logger.Log(LogLevel.WARN, "Api version mismatched; Undefined behaviour can be occurred");
-        }
-        
-        if (proj.Name is null)
-        {
-            Logger.Log(LogLevel.CRIT, "The property 'Name' has not found in project");
-            return (0, 0);
-        }
-
-        if (proj.PostDirectory is null)
-        {
-            Logger.Log(LogLevel.WARN, "Post directory has not been set; Default value used");
-            proj.PostDirectory = "post/";
-        }
-        if (proj.BuildDirectory is null)
-        {
-            Logger.Log(LogLevel.WARN, "Build directory has not been set; Default value used");
-            proj.BuildDirectory = "obj/";
-        }
-        if (proj.SiteDirectory is null)
-        {
-            Logger.Log(LogLevel.WARN, "Site directory has not been set; Default value used");
-            proj.SiteDirectory = "site/";
-        }
-
         var total = 0;
         var success = 0;
-        Logger.Log(LogLevel.INFO, "Compiling start", proj.Name);
-        Parallel.ForEach(EnumerateFiles(new DirectoryInfo(proj.PostDirectory)), file =>
+        Logger.Log(LogLevel.INFO, "Compiling start", proj.Info.Name);
+        Parallel.ForEach(EnumerateFiles(new DirectoryInfo(proj.Info.PostDirectory)), file =>
         {
             Logger.Log(LogLevel.INFO, "Compiling start", file.FullName);
             Interlocked.Increment(ref total);
@@ -66,9 +34,8 @@ public class Compiler
                 Logger.Log(LogLevel.FAIL, "Failed to compile", file.FullName);
             }
         });
-        Logger.Log(LogLevel.CMPL, $"Compiling complete ({success}/{total})", proj.Name);
 
-        return (total, success);
+        return total == success;
     }
 
     private static IEnumerable<FileInfo> EnumerateFiles(DirectoryInfo dir)
@@ -82,8 +49,8 @@ public class Compiler
 
     private static bool Compile(string file, Project proj)
     {
-        var dst = Path.GetRelativePath(proj.PostDirectory!, file);
-        dst = Path.GetFullPath(proj.BuildDirectory!, dst);
+        var dst = Path.GetRelativePath(proj.Info.PostDirectory, file);
+        dst = Path.GetFullPath(proj.Info.BuildDirectory, dst);
         var dstyaml = Path.ChangeExtension(dst, ".yaml");
         var dsthtml = Path.ChangeExtension(dst, ".html");
 

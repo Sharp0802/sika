@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AngleSharp;
@@ -5,7 +6,6 @@ using AngleSharp.Html;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using BlogMan.Models;
-using BlogMan.Structures;
 using RazorEngine;
 using RazorEngine.Templating;
 using YamlDotNet.Serialization;
@@ -33,117 +33,20 @@ public class Linker
         _escapedMap = files.ToDictionary(
             node => node.GetIdentifier(),
             node => node.GetEscapedIdentifier());
-        _layoutMap = Directory.EnumerateFiles(project.LayoutDirectory!).ToDictionary(
+        _layoutMap = Directory.EnumerateFiles(project.Info.LayoutDirectory).ToDictionary(
             dir => Path.GetFileName(dir).ToLowerInvariant(),
             dir => dir);
     }
 
-    public static (int Success, int Total) Link(Project project)
+    public static bool Link(Project project)
     {
-        if (!AssertProject(project))
-        {
-            Logger.Log(LogLevel.CRIT, "Invalid project property detected.");
-            return (0, 0);
-        }
-
         return new Linker(project).Link();
     }
 
-    private (int Success, int Total) Link()
+    private bool Link()
     {
-        if (!AssertProject(_project))
-        {
-            Logger.Log(LogLevel.FAIL, "Invalid project declaration detected.");
-            return (0, 0);
-        }
-
         var files = _tree.GetAllFile().ToArray();
-        return (files.AsParallel().Count(LinkFile), files.Length);
-    }
-
-    private static bool AssertProject(Project proj)
-    {
-        if (proj.ApiVersion is null)
-        {
-            Logger.Log(LogLevel.WARN, "Cannot retrieve the api version; Undefined behaviour can be occurred");
-        }
-        else if (proj.ApiVersion != Assembly.GetExecutingAssembly().GetName().Version)
-        {
-            Logger.Log(LogLevel.WARN, "Api version mismatched; Undefined behaviour can be occurred");
-        }
-
-        if (proj.Name is null)
-        {
-            Logger.Log(LogLevel.CRIT, "The property 'Name' has not found in project");
-            return false;
-        }
-
-        if (proj.PostDirectory is null)
-        {
-            Logger.Log(LogLevel.WARN, "Post directory has not been set; Default value used");
-            proj.PostDirectory = "post/";
-        }
-
-        if (proj.LayoutDirectory is null)
-        {
-            Logger.Log(LogLevel.WARN, "Layout directory has not been set; Default value used");
-            proj.LayoutDirectory = "layout/";
-        }
-
-        if (proj.BuildDirectory is null)
-        {
-            Logger.Log(LogLevel.WARN, "Build directory has not been set; Default value used");
-            proj.BuildDirectory = "obj/";
-        }
-
-        if (proj.SiteDirectory is null)
-        {
-            Logger.Log(LogLevel.WARN, "Site directory has not been set; Default value used");
-            proj.SiteDirectory = "site/";
-        }
-
-        return SEH.IO(proj, static proj =>
-        {
-            if (!Directory.Exists(proj.PostDirectory))
-                Directory.CreateDirectory(proj.PostDirectory!);
-            if (!Directory.Exists(proj.LayoutDirectory))
-                Directory.CreateDirectory(proj.LayoutDirectory!);
-            if (!Directory.Exists(proj.BuildDirectory))
-                Directory.CreateDirectory(proj.BuildDirectory!);
-            if (!Directory.Exists(proj.SiteDirectory))
-                Directory.CreateDirectory(proj.SiteDirectory!);
-        });
-    }
-
-    private static bool AssertMetadata(PostTreeNode node, PostFrontMatter metadata)
-    {
-        var ret = true;
-
-        if (metadata.Layout is null)
-        {
-            Logger.Log(LogLevel.WARN, "Layout cannot be null.", node.GetIdentifier());
-            ret = false;
-        }
-
-        if (metadata.Date is null)
-        {
-            Logger.Log(LogLevel.WARN, "Date cannot be null.", node.GetIdentifier());
-            ret = false;
-        }
-
-        if (metadata.Title is null)
-        {
-            Logger.Log(LogLevel.WARN, "Title cannot be null.", node.GetIdentifier());
-            ret = false;
-        }
-
-        if (metadata.Topic is null)
-        {
-            Logger.Log(LogLevel.WARN, "Topic cannot be null.", node.GetIdentifier());
-            ret = false;
-        }
-
-        return ret;
+        return files.AsParallel().Count(LinkFile) == files.Length;
     }
 
     private bool LinkFile(PostTreeNode node)
@@ -187,22 +90,26 @@ public class Linker
         if (!ior)
             return false;
 
-        if (!AssertMetadata(node, metadata))
+        var errors = metadata.Validate().ToArray();
+        if (errors.Any())
         {
             Logger.Log(LogLevel.FAIL, "Invalid metadata detected.");
-            return false;
+            errors.PrintErrors(node.File.FullName);
+            return false;    
         }
 
+        node.Metadata = metadata;
+
         html = Engine.Razor.RunCompile(
-            _layoutMap[metadata.Layout!],
+            _layoutMap[metadata.Layout],
             node.GetIdentifier(),
             typeof(TemplateModel),
-            new TemplateModel(metadata, html));
+            new TemplateModel(_project, metadata, _tree, html));
 
         ior = SEH.IO((object)null!, _ =>
         {
-            var fname = Path.GetRelativePath(_project.BuildDirectory!, node.File.FullName);
-            fname = Path.GetFullPath(fname, _project.SiteDirectory!);
+            var fname = Path.GetRelativePath(_project.Info.BuildDirectory, node.File.FullName);
+            fname = Path.GetFullPath(fname, _project.Info.SiteDirectory);
             File.WriteAllText(fname, html, Encoding.UTF8);
         });
         if (!ior)
@@ -213,14 +120,14 @@ public class Linker
 
     private static PostTree? BuildTree(Project proj)
     {
-        var files = new DirectoryInfo(proj.BuildDirectory!).GetFiles();
+        var files = new DirectoryInfo(proj.Info.BuildDirectory).GetFiles();
         var welcome = files.SingleOrDefault(f => Path
             .GetFileNameWithoutExtension(f.Name)
             .Equals("welcome", StringComparison.OrdinalIgnoreCase));
         var error = files.SingleOrDefault(f => Path
             .GetFileNameWithoutExtension(f.Name)
             .Equals("error", StringComparison.OrdinalIgnoreCase));
-        var roots = new DirectoryInfo(proj.PostDirectory!)
+        var roots = new DirectoryInfo(proj.Info.PostDirectory)
             .GetFileSystemInfos()
             .Select(f => new PostTreeNode(f, null))
             .ToArray();
