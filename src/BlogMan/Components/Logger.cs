@@ -9,12 +9,11 @@ public enum LogLevel
     CMPL
 }
 
-public class Logger
+public static class Logger
 {
-    private static object LockHandle = new();
+    private static readonly object LockHandle = new();
 
-    private static ConsoleColor[] Colors = new[]
-    {
+    private static readonly ConsoleColor[] Colors = {
         ConsoleColor.Red,
         ConsoleColor.DarkRed,
         ConsoleColor.Yellow,
@@ -22,8 +21,7 @@ public class Logger
         ConsoleColor.Green
     };
 
-    private static string[] Headers = new[]
-    {
+    private static readonly string[] Headers = {
         "crit",
         "fail",
         "warn",
@@ -35,7 +33,6 @@ public class Logger
     {
         lock (LockHandle)
         {
-            Console.Write("blogman: ");
             var pre = Console.ForegroundColor;
             Console.ForegroundColor = Colors[(int)lv];
             Console.Write(Headers[(int)lv]);
@@ -54,7 +51,6 @@ public class Logger
     {
         lock (LockHandle)
         {
-            Console.Write("blogman: ");
             var pre = Console.ForegroundColor;
             Console.ForegroundColor = Colors[(int)lv];
             Console.Write(Headers[(int)lv]);
@@ -68,7 +64,6 @@ public class Logger
     {
         lock (LockHandle)
         {
-            Console.Write("blogman: ");
             var pre = Console.ForegroundColor;
             Console.ForegroundColor = Colors[(int)lv];
             Console.Write(Headers[(int)lv]);
