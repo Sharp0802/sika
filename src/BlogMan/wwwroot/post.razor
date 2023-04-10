@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="@Model.Metadata.LCID">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="keywords" content="@(string.Join(',', Model.Header.Topics))"/>
+    <title>@Model.Header.Title</title>
+    <link rel="stylesheet" href="style/gfm-dark.css"/>
+    <link rel="stylesheet" href="style/post.css"/>
+    <script src="script/treeview.js" defer></script>
+    <script src="script/search.js" defer></script>
+</head>
+
+<body>
+
+<nav class="sidenav">
+    <!-- PROFILE -->
+    <section id="profile">
+        <img alt="" id="profile-img" src="@Model.Profile.ProfileImage"/>
+        <h3>@Model.Profile.UserName</h3>
+        <ul id="contacts">
+            @if (!(Model.Contacts.GitHub is null))
+            {
+                <li class="github-logo"><a href="@Model.Contacts.GitHub">GitHub Account</a></li>
+            }
+            @if (!(Model.Contacts.Email is null))
+            {
+                <li class="email-logo"><a href="mailto:@Model.Contacts.Email">Email</a></li>
+            }
+            @foreach (var link in Model.Contacts.Misc)
+            {
+                <li class="email-logo"><a href="@link.HRef">@link.Name</a></li>
+            }
+        </ul>
+    </section>
+
+    <br/>
+
+    <!-- SEARCH FORM -->
+    <form role="search" id="search-form">
+        <svg viewBox="0 0 1024 1024">
+            <path d="M848.471 928l-263.059-263.059c-48.941 36.706-110.118 55.059-177.412 55.059-171.294 0-312-140.706-312-312s140.706-312 312-312c171.294 0 312 140.706 312 312 0 67.294-24.471 128.471-55.059 177.412l263.059 263.059-79.529 79.529zM189.623 408.078c0 121.364 97.091 218.455 218.455 218.455s218.455-97.091 218.455-218.455c0-121.364-103.159-218.455-218.455-218.455-121.364 0-218.455 97.091-218.455 218.455z"/>
+        </svg>
+        <input id="search-box" type="text" placeholder="Search"/>
+    </form>
+
+    <!-- TREE VIEW -->
+    <ul id="tree-view">
+        @Raw(Model.PostTree.GetHtml())
+    </ul>
+</nav>
+
+<header id="article-header">
+    <h1>@Model.Header.Title</h1>
+    <ul id="date-log">
+        @{
+            bool first = true;
+            foreach (var date in Model.Metadata.RawTimestamps)
+            {
+                if (first)
+                {
+                    <li>Created @date</li>
+                }
+                else
+                {
+                    <li>Updated @date</li>
+                }
+                first = false;
+            }
+        }
+    </ul>
+</header>
+
+<main id="article-main" class="markdown-body">
+    @Raw(Model.Html)
+</main>
+
+</body>
+
+</html> 
