@@ -7,14 +7,14 @@ namespace BlogMan.Models;
 [Serializable, YamlSerializable]
 public partial class Contacts : IValidatableObject
 {
-    [Required(AllowEmptyStrings = false)]
-    public string GitHub { get; }
-    
-    [Required(AllowEmptyStrings = false)]
-    public string Email { get; }
+    [Required]
+    public string GitHub { get; set; }
     
     [Required]
-    public LinkReference[] Misc { get; }
+    public string Email { get; set; }
+    
+    [Required]
+    public LinkReference[] Misc { get; set; }
 
     public Contacts(string github, string email, LinkReference[] misc)
     {

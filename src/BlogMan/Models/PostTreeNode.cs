@@ -67,6 +67,8 @@ public partial class PostTreeNode : IValidatableObject
         {
             if (Metadata is null)
                 return null;
+            if (Parent is null && File.Name.Equals("Error.html", StringComparison.OrdinalIgnoreCase))
+                return null;
             
             var id = HttpUtility.HtmlAttributeEncode(GetEscapedIdentifier());
             elem = new XElement("li",

@@ -10,6 +10,9 @@ public partial class TemplateModel : IValidatableObject
     public string Layout { get; }
     
     [Required]
+    public PostFrontMatter Metadata { get; }
+    
+    [Required]
     public HeaderInfo Header { get; }
     
     [Required]
@@ -27,6 +30,7 @@ public partial class TemplateModel : IValidatableObject
     public TemplateModel(Project project, PostFrontMatter metadata, PostTree tree, string html)
     {
         Layout = metadata.Layout;
+        Metadata = metadata;
         Header = new HeaderInfo(metadata.Title, metadata.Topic, metadata.Timestamps);
         Profile = project.Profile;
         Contacts = project.Contacts;

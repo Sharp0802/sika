@@ -5,10 +5,11 @@
         <type fullname="BlogMan.Models.HeaderInfo" preserve="all" />
         <type fullname="BlogMan.Models.LinkReference" preserve="all" />
         <type fullname="BlogMan.Models.PostFrontMatter" preserve="all" />
+        <type fullname="BlogMan.Models.PostTree" preserve="all" />
+        <type fullname="BlogMan.Models.PostTreeNode" preserve="all" />
         <type fullname="BlogMan.Models.ProfileInfo" preserve="all" />
         <type fullname="BlogMan.Models.Project" preserve="all" />
         <type fullname="BlogMan.Models.ProjectInfo" preserve="all" />
         <type fullname="BlogMan.Models.TemplateModel" preserve="all" />
-        <type fullname="BlogMan.Structures.PostTreeNode" preserve="all" />
     </assembly>
 </linker>
