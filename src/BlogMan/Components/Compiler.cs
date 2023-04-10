@@ -65,14 +65,14 @@ public class Compiler
                 {
                     if (md.Descendants<YamlFrontMatterBlock>().FirstOrDefault() is { } yaml)
                     {
-                        File.WriteAllText(dstyaml, dstyaml, Encoding.UTF8);
+                        File.WriteAllText(args.Yaml, yaml.ToPositionText(), Encoding.UTF8);
                     }
                     else
                     {
                         Logger.Log(LogLevel.WARN, "Yaml front-matter not found.", file);
                     }
                 },
-                () => File.WriteAllText(dsthtml, md.ToHtml(Pipeline), Encoding.UTF8)
+                () => File.WriteAllText(args.Html, md.ToHtml(Pipeline), Encoding.UTF8)
             );
         });
     }
