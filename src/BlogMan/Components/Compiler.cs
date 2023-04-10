@@ -6,7 +6,7 @@ using Markdig.Syntax;
 
 namespace BlogMan.Components;
 
-public class Compiler
+public static class Compiler
 {
     [field: ThreadStatic] private static MarkdownPipeline? _pipeline;
     
@@ -59,13 +59,21 @@ public class Compiler
             var dstdir = new DirectoryInfo(Path.GetDirectoryName(dst)!);
             if (!dstdir.Exists) dstdir.Create();
 
-            var md = Markdown.Parse(File.ReadAllText(file), Pipeline);
+            var txt = File.ReadAllText(file);
+            var md = Markdown.Parse(txt, Pipeline);
             Parallel.Invoke(
                 () =>
                 {
                     if (md.Descendants<YamlFrontMatterBlock>().FirstOrDefault() is { } yaml)
                     {
-                        File.WriteAllText(args.Yaml, yaml.ToPositionText(), Encoding.UTF8);
+                        var yamlText = txt.Substring(yaml.Span.Start, yaml.Span.Length);
+                        yamlText = yamlText
+                            .Split('\n')
+                            .Skip(1)
+                            .SkipLast(1)
+                            .Aggregate(new StringBuilder(), (builder, str) => builder.AppendLine(str))
+                            .ToString();
+                        File.WriteAllText(args.Yaml, yamlText, Encoding.UTF8);
                     }
                     else
                     {
