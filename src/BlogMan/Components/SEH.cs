@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using System;
 using System.Security;
 namespace BlogMan.Components;
 
@@ -27,7 +26,7 @@ public static class SEH
         return false;
     }
 
-    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn>? io, out Nullable<TReturn> ret) where TReturn : struct
+    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret) where TReturn : struct
     {
         try
         {
@@ -50,7 +49,7 @@ public static class SEH
         return false;
     }
 
-    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn>? io, out TReturn? ret) where TReturn : class
+    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret) where TReturn : class
     {
         try
         {
