@@ -21,4 +21,10 @@
         <PackageReference Include="YamlDotNet" Version="13.0.2" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="wwwroot/**/*.*">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>
