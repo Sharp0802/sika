@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AngleSharp;
@@ -24,8 +23,11 @@ public class Linker
     private readonly Dictionary<string, string> _escapedMap;
     private readonly Dictionary<string, string> _layoutMap;
 
+
     private Linker(Project project)
     {
+        if (!Directory.Exists(project.Info.SiteDirectory))
+            Directory.CreateDirectory(project.Info.SiteDirectory);
         _project = project;
         if ((_tree = BuildTree(project)!) is null)
             throw new InvalidDataException();
@@ -33,9 +35,44 @@ public class Linker
         _escapedMap = files.ToDictionary(
             node => node.GetIdentifier(),
             node => node.GetEscapedIdentifier());
+        if (!Directory.Exists(project.Info.LayoutDirectory))
+            Directory.CreateDirectory(project.Info.LayoutDirectory);
         _layoutMap = Directory.EnumerateFiles(project.Info.LayoutDirectory).ToDictionary(
-            dir => Path.GetFileName(dir).ToLowerInvariant(),
-            dir => dir);
+            Path.GetFileName,
+            File.ReadAllText);
+
+        var wwwroot = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location)
+            ?? throw new ReflectionTypeLoadException(
+                new[] { typeof(Assembly) },
+                null,
+                "Failed to load assembly"), "wwwroot/");
+        if (!_layoutMap.ContainsKey("default"))
+            _layoutMap.Add("default", File.ReadAllText(wwwroot + "post.razor")); 
+        CopyDirectory(wwwroot, project.Info.SiteDirectory, true);
+    }
+    
+    private static void CopyDirectory(string src, string dst, bool recurse)
+    {
+        var dir = new DirectoryInfo(src);
+        var dirs = dir.GetDirectories();
+        Directory.CreateDirectory(dst);
+
+        foreach (var file in dir.GetFiles())
+        {
+            var path = Path.Combine(dst, file.Name);
+            if (File.Exists(path))
+                File.Delete(path);
+            file.CopyTo(path);
+        }
+
+        if (!recurse) return;
+        
+        foreach (var subDir in dirs)
+        {
+            var newDestinationDir = Path.Combine(dst, subDir.Name);
+            CopyDirectory(subDir.FullName, newDestinationDir, true);
+        }
     }
 
     public static bool Link(Project project)
@@ -72,44 +109,51 @@ public class Linker
         if (!ior)
             return false;
 
-        var htmlname = node.File.FullName;
-        var yamlname = Path.ChangeExtension(htmlname, ".yaml");
-        if (!File.Exists(yamlname))
+        var htmlName = node.File.FullName;
+        var yamlName = Path.ChangeExtension(htmlName, ".yaml");
+        Console.WriteLine(yamlName);
+        if (!File.Exists(yamlName))
         {
             Logger.Log(LogLevel.FAIL, "Failed to retrieve yaml front-matter");
             return false;
         }
 
         Unsafe.SkipInit(out PostFrontMatter metadata);
-        ior = SEH.IO(yamlname, name =>
+        ior = SEH.IO(yamlName, name =>
         {
-            using var yamlstream = File.OpenRead(name);
-            using var yamlreader = new StreamReader(yamlstream, Encoding.UTF8);
-            metadata = Deserializer.Deserialize<PostFrontMatter>(yamlreader);
+            using var yamlStream = File.OpenRead(name);
+            using var yamlReader = new StreamReader(yamlStream, Encoding.UTF8);
+            metadata = Deserializer.Deserialize<PostFrontMatter>(yamlReader);
         });
         if (!ior)
             return false;
 
         var errors = metadata.Validate().ToArray();
-        if (errors.Any())
+        if (errors.Length != 0)
         {
             Logger.Log(LogLevel.FAIL, "Invalid metadata detected.");
             errors.PrintErrors(node.File.FullName);
-            return false;    
+            return false;
         }
 
         node.Metadata = metadata;
 
         html = Engine.Razor.RunCompile(
             _layoutMap[metadata.Layout],
-            node.GetIdentifier(),
+            Guid.NewGuid().ToString(),
             typeof(TemplateModel),
             new TemplateModel(_project, metadata, _tree, html));
 
         ior = SEH.IO((object)null!, _ =>
         {
-            var fname = Path.GetRelativePath(_project.Info.BuildDirectory, node.File.FullName);
-            fname = Path.GetFullPath(fname, _project.Info.SiteDirectory);
+            var fname = Path.GetRelativePath(
+                _project.Info.BuildDirectory,
+                node.Parent is null && node.File.Name.Equals("Error.html", StringComparison.OrdinalIgnoreCase)
+                    ? Path.Combine(Path.GetDirectoryName(node.File.FullName)!, "404.html") 
+                    : node.File.FullName);
+            Console.WriteLine(fname);
+            fname = Path.GetFullPath(fname, Path.GetFullPath(_project.Info.SiteDirectory));
+            Console.WriteLine(fname);
             File.WriteAllText(fname, html, Encoding.UTF8);
         });
         if (!ior)
@@ -120,15 +164,16 @@ public class Linker
 
     private static PostTree? BuildTree(Project proj)
     {
-        var files = new DirectoryInfo(proj.Info.BuildDirectory).GetFiles();
+        var files = new DirectoryInfo(proj.Info.BuildDirectory).GetFiles("*.html");
         var welcome = files.SingleOrDefault(f => Path
             .GetFileNameWithoutExtension(f.Name)
             .Equals("welcome", StringComparison.OrdinalIgnoreCase));
         var error = files.SingleOrDefault(f => Path
             .GetFileNameWithoutExtension(f.Name)
             .Equals("error", StringComparison.OrdinalIgnoreCase));
-        var roots = new DirectoryInfo(proj.Info.PostDirectory)
+        var roots = new DirectoryInfo(proj.Info.BuildDirectory)
             .GetFileSystemInfos()
+            .Where(fs => (fs.Attributes & FileAttributes.Directory) != 0 || fs.FullName.EndsWith(".html"))
             .Select(f => new PostTreeNode(f, null))
             .ToArray();
 

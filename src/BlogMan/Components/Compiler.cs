@@ -50,14 +50,14 @@ public static class Compiler
     private static bool Compile(string file, Project proj)
     {
         var dst = Path.GetRelativePath(proj.Info.PostDirectory, file);
-        dst = Path.GetFullPath(proj.Info.BuildDirectory, dst);
-        var dstyaml = Path.ChangeExtension(dst, ".yaml");
-        var dsthtml = Path.ChangeExtension(dst, ".html");
+        dst = Path.GetFullPath(dst, Path.GetFullPath(proj.Info.BuildDirectory));
+        var dstYaml = Path.ChangeExtension(dst, ".yaml");
+        var dstHtml = Path.ChangeExtension(dst, ".html");
 
-        return SEH.IO((Yaml: dstyaml, Html: dsthtml), args =>
+        return SEH.IO((Yaml: dstYaml, Html: dstHtml), args =>
         {
-            var dstdir = new DirectoryInfo(Path.GetDirectoryName(dst)!);
-            if (!dstdir.Exists) dstdir.Create();
+            var dstInfo = new DirectoryInfo(Path.GetDirectoryName(dst)!);
+            if (!dstInfo.Exists) dstInfo.Create();
 
             var txt = File.ReadAllText(file);
             var md = Markdown.Parse(txt, Pipeline);
