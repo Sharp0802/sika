@@ -1,7 +1,5 @@
 using System.CommandLine;
-using System.Globalization;
 using System.Reflection;
-using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using BlogMan.Models;
@@ -14,10 +12,6 @@ public static class Initializer
     public static void InitializeRoot(RootCommand root)
     {
         var project = new Option<FileInfo>("--project", "Specify project that target of command")
-        {
-            IsRequired = true
-        };
-        var type = new Option<string>("--type", "Specify the type of resource to create")
         {
             IsRequired = true
         };
@@ -34,35 +28,57 @@ public static class Initializer
         link.AddOption(project);
         link.SetHandler(Link, project);
 
-        var @new = new Command("new", "Create a new resource");
-        @new.AddOption(type);
+        var @new = new Command("new", "Create a new post");
+        @new.AddOption(project);
         @new.AddOption(name);
-        @new.SetHandler(New, type, name);
+        @new.SetHandler(New, project, name);
+
+        var init = new Command("init", "Create a new project");
+        init.AddOption(name);
+        init.SetHandler(Init, name);
+        
+        var clean = new Command("clean", "Clean the build directories of specific project");
+        clean.AddOption(project);
+        clean.SetHandler(Clean, project);
 
         root.AddCommand(compile);
         root.AddCommand(link);
         root.AddCommand(@new);
+        root.AddCommand(init);
+        root.AddCommand(clean);
+    }
+
+    private static Project? ReadProject(FileInfo project)
+    {
+        return SEH.IO(project, static project =>
+        {
+            using var file = File.OpenRead(project.FullName);
+            using var reader = XmlReader.Create(file);
+            var serializer = new XmlSerializer(typeof(Project));
+            if (!serializer.CanDeserialize(reader))
+            {
+                Logger.Log(LogLevel.FAIL, "Cannot deserialize project file", project.FullName);
+                return null;
+            }
+
+            var data = (Project)serializer.Deserialize(reader)!;
+
+            var errors = data.Validate().ToArray();
+            if (errors.Length != 0)
+            {
+                errors.PrintErrors(project.FullName);
+                return null;
+            }
+
+            return data;
+        }, out var data) ? data : null;
     }
 
     private static void Compile(FileInfo project)
     {
-        using var file = File.OpenRead(project.FullName);
-        using var reader = XmlReader.Create(file);
-        var serializer = new XmlSerializer(typeof(Project));
-        if (!serializer.CanDeserialize(reader))
-        {
-            Logger.Log(LogLevel.FAIL, "Cannot deserialize project file", project.FullName);
+        var data = ReadProject(project);
+        if (data is null)
             return;
-        }
-        var data = (Project)serializer.Deserialize(reader)!;
-
-        var errors = data.Validate().ToArray();
-        if (errors.Any())
-        {
-            errors.PrintErrors(project.FullName);
-            return;
-        }
-
         if (Compiler.Compile(data))
             Logger.Log(LogLevel.CMPL, "Complete compiling project");
         else
@@ -71,90 +87,86 @@ public static class Initializer
 
     private static void Link(FileInfo project)
     {
-        using var file = File.OpenRead(project.FullName);
-        using var reader = XmlReader.Create(file);
-        var serializer = new XmlSerializer(typeof(Project));
-        if (!serializer.CanDeserialize(reader))
-        {
-            Logger.Log(LogLevel.FAIL, "Cannot deserialize project file", project.FullName);
+        var data = ReadProject(project);
+        if (data is null)
             return;
-        }
-        var data = (Project)serializer.Deserialize(reader)!;
-
-        var errors = data.Validate().ToArray();
-        if (errors.Any())
-        {
-            errors.PrintErrors(project.FullName);
-            return;
-        }
-
         if (Linker.Link(data))
             Logger.Log(LogLevel.CMPL, "Complete compiling project");
         else
             Logger.Log(LogLevel.FAIL, "Failed to compile project");
     }
 
-    private static void New(string type, string name)
+    private static void Init(string name)
     {
-        try
+        var file = new FileInfo($"{name}.blog.xml");
+        SEH.IO(file, _ =>
         {
-            switch (type)
+            if (file.Exists)
             {
-                case "project":
-                    using (var file = File.OpenWrite($"{name}.xml"))
-                    {
-                        new XmlSerializer(typeof(Project)).Serialize(file, new Project(
-                                new ProjectInfo(
-                                    name,
-                                    Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0),
-                                    "post/",
-                                    "layout/",
-                                    "site/",
-                                    "build/"
-                                ),
-                                new ProfileInfo(
-                                    "<your-name>",
-                                    "<profile-image>"
-                                ),
-                                new Contacts(
-                                    "<your-github-accout-here>",
-                                    "<your-email-here>",
-                                    Array.Empty<LinkReference>()
-                                )
-                            )
-                        );
-                    }
-
-                    break;
-                case "post":
-                    using (var file = File.OpenWrite($"{DateTime.Now:yyyyMMdd}_{name}.md"))
-                    using (var writer = new StreamWriter(file, Encoding.UTF8))
-                    {
-                        writer.WriteLine("---");
-                        new Serializer().Serialize(
-                            writer,
-                            new PostFrontMatter(
-                                CultureInfo.CurrentCulture.Name,
-                                "default",
-                                name,
-                                new[] { DateTime.Now },
-                                Array.Empty<string>()));
-                        writer.WriteLine("---");
-                        writer.WriteLine();
-                        writer.WriteLine($"# {name}");
-                    }
-
-                    break;
-                case "layout":
-                    File.Create($"{name}.razor");
-                    break;
-                default:
-                    throw new InvalidOperationException($"Invalid resource type: '{type}'");
+                Logger.Log(LogLevel.FAIL, "File already exists", file.FullName);
+                return;
             }
-        }
-        catch (Exception e)
+            
+            using var writer = file.CreateText();
+            
+            new XmlSerializer(typeof(Project)).Serialize(writer, new Project(
+                new ProjectInfo(
+                    name, 
+                    Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(0, 0, 0), 
+                    "post/", 
+                    "layout/", 
+                    "site/", 
+                    "build/"),
+                new ProfileInfo(
+                    "your-name", 
+                    "thumbnail-here"),
+                new Contacts(
+                    "your-github-link", 
+                    "your-email", 
+                    Array.Empty<LinkReference>())));
+        });
+    }
+
+    private static void New(FileInfo project, string name)
+    {
+        var data = ReadProject(project);
+        if (data is null)
+            return;
+        var file = new FileInfo($"{Path.Combine(data.Info.PostDirectory, name)}.md");
+        SEH.IO(file, _ =>
         {
-            Logger.Log(LogLevel.CRIT, e);
-        }
+            if (!Directory.Exists(data.Info.PostDirectory))
+                Directory.CreateDirectory(data.Info.PostDirectory);
+            
+            if (file.Exists)
+            {
+                Logger.Log(LogLevel.FAIL, "File already exists", file.FullName);
+                return;
+            }
+
+            using var writer = file.CreateText();
+
+            writer.Write("---\n");
+            
+            new Serializer().Serialize(writer, new PostFrontMatter(
+                "en-us",
+                "default",
+                name,
+                new[] { DateTime.Now },
+                Array.Empty<string>()));
+            
+            writer.Write($"---\n\n# {name}\n");
+        });
+    }
+
+    private static void Clean(FileInfo project)
+    {
+        var data = ReadProject(project);
+        if (data is null)
+            return;
+        if (Directory.Exists(data.Info.BuildDirectory))
+            Directory.Delete(data.Info.BuildDirectory, true);
+        if (Directory.Exists(data.Info.SiteDirectory))
+            Directory.Delete(data.Info.SiteDirectory, true);
     }
 }
