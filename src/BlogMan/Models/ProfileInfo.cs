@@ -14,9 +14,9 @@ public partial class ProfileInfo : IValidatableObject
         ProfileImage = image;
     }
 
-    [Required(AllowEmptyStrings = false)] public string UserName { get; set; }
+    [Required] public string UserName { get; set; }
 
-    [Required(AllowEmptyStrings = false)] public string ProfileImage { get; set; }
+    [Required] public string ProfileImage { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
