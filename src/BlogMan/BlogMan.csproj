@@ -11,6 +11,9 @@
     <ItemGroup>
         <TrimmerRootDescriptor Include="Resources/TrimmerRoots.xml" />
     </ItemGroup>
+    <PropertyGroup>
+        <PublishTrimmed>true</PublishTrimmed>
+    </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="../BlogMan.Generator/BlogMan.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
@@ -24,6 +27,9 @@
     <ItemGroup>
         <None Update="wwwroot/**/*.*">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Resources\post.razor">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 

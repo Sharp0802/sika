@@ -1,10 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using System.Xml.Serialization;
 using BlogMan.Components;
 
 namespace BlogMan.Models;
 
-[Serializable, XmlRoot]
+[Serializable]
 public partial class Project : IValidatableObject
 {
     [Required]

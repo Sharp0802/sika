@@ -37,18 +37,23 @@ public class Linker
             node => node.GetEscapedIdentifier());
         if (!Directory.Exists(project.Info.LayoutDirectory))
             Directory.CreateDirectory(project.Info.LayoutDirectory);
+#pragma warning disable CS8714
+#pragma warning disable CS8619
         _layoutMap = Directory.EnumerateFiles(project.Info.LayoutDirectory).ToDictionary(
             Path.GetFileName,
             File.ReadAllText);
+#pragma warning restore CS8619
+#pragma warning restore CS8714
 
-        var wwwroot = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location)
-            ?? throw new ReflectionTypeLoadException(
-                new[] { typeof(Assembly) },
-                null,
-                "Failed to load assembly"), "wwwroot/");
+        var asmLoc = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location)
+                     ?? throw new ReflectionTypeLoadException(
+                         new[] { typeof(Assembly) },
+                         null,
+                         "Failed to load assembly");
+        var wwwroot = Path.Combine(asmLoc, "wwwroot/");
+        var resroot = Path.Combine(asmLoc, "Resources/");
         if (!_layoutMap.ContainsKey("default"))
-            _layoutMap.Add("default", File.ReadAllText(wwwroot + "post.razor")); 
+            _layoutMap.Add("default", File.ReadAllText(resroot + "post.razor")); 
         CopyDirectory(wwwroot, project.Info.SiteDirectory, true);
     }
     
