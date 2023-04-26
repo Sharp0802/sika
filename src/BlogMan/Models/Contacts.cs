@@ -4,24 +4,22 @@ using YamlDotNet.Serialization;
 
 namespace BlogMan.Models;
 
-[Serializable, YamlSerializable]
+[Serializable]
+[YamlSerializable]
 public partial class Contacts : IValidatableObject
 {
-    [Required]
-    public string GitHub { get; set; }
-    
-    [Required]
-    public string Email { get; set; }
-    
-    [Required]
-    public LinkReference[] Misc { get; set; }
-
     public Contacts(string github, string email, LinkReference[] misc)
     {
         GitHub = github;
-        Email = email;
-        Misc = misc;
+        Email  = email;
+        Misc   = misc;
     }
+
+    [Required] public string GitHub { get; set; }
+
+    [Required] public string Email { get; set; }
+
+    [Required] public LinkReference[] Misc { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {

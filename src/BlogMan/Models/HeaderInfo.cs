@@ -4,24 +4,22 @@ using YamlDotNet.Serialization;
 
 namespace BlogMan.Models;
 
-[Serializable, YamlSerializable]
+[Serializable]
+[YamlSerializable]
 public partial class HeaderInfo : IValidatableObject
 {
-    [Required(AllowEmptyStrings = false)]
-    public string Title { get; set; }
-    
-    [Required]
-    public string[] Topics { get; set; }
-    
-    [Required]
-    public DateTime[] Timestamps { get; set; }
-
     public HeaderInfo(string title, string[] topics, DateTime[] timestamps)
     {
-        Title = title;
-        Topics = topics;
+        Title      = title;
+        Topics     = topics;
         Timestamps = timestamps;
     }
+
+    [Required(AllowEmptyStrings = false)] public string Title { get; set; }
+
+    [Required] public string[] Topics { get; set; }
+
+    [Required] public DateTime[] Timestamps { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {

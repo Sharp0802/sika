@@ -6,21 +6,18 @@ namespace BlogMan.Models;
 [Serializable]
 public partial class Project : IValidatableObject
 {
-    [Required]
-    public ProjectInfo Info { get; set; }
-
-    [Required]
-    public ProfileInfo Profile { get; set; }
-    
-    [Required]
-    public Contacts Contacts { get; set; }
-
     public Project(ProjectInfo info, ProfileInfo profile, Contacts contacts)
     {
-        Info = info;
-        Profile = profile;
+        Info     = info;
+        Profile  = profile;
         Contacts = contacts;
     }
+
+    [Required] public ProjectInfo Info { get; set; }
+
+    [Required] public ProfileInfo Profile { get; set; }
+
+    [Required] public Contacts Contacts { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {

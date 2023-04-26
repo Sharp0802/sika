@@ -8,22 +8,28 @@ namespace BlogMan.Models;
 [Serializable]
 public partial class PostTreeNode : IValidatableObject
 {
-    public FileSystemInfo File { get; }
-    
-    [Required]
-    public PostFrontMatter? Metadata { get; set; }
-    
-    public PostTreeNode[] Children { get; }
-    
-    public PostTreeNode? Parent { get; }
-
     public PostTreeNode(FileSystemInfo file, PostTreeNode? parent)
     {
-        File = file;
+        File   = file;
         Parent = parent;
         Children = file is DirectoryInfo d
             ? d.GetFileSystemInfos().Select(f => new PostTreeNode(f, this)).ToArray()
             : Array.Empty<PostTreeNode>();
+    }
+
+    public FileSystemInfo File { get; }
+
+    [Required] public PostFrontMatter? Metadata { get; set; }
+
+    public PostTreeNode[] Children { get; }
+
+    public PostTreeNode? Parent { get; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext ctx)
+    {
+        var list = new List<ValidationResult>();
+        list.AddRange(this.ValidateProperty(nameof(Metadata)));
+        return list;
     }
 
     private IEnumerable<PostTreeNode> GetUpperBranch()
@@ -58,18 +64,18 @@ public partial class PostTreeNode : IValidatableObject
             yield return item;
     }
 
-    
+
     public XElement? GetHtml()
     {
         XElement elem;
-        
+
         if ((File.Attributes & FileAttributes.Directory) == 0)
         {
             if (Metadata is null)
                 return null;
             if (Parent is null && File.Name.Equals("Error.html", StringComparison.OrdinalIgnoreCase))
                 return null;
-            
+
             var id = HttpUtility.HtmlAttributeEncode(GetEscapedIdentifier());
             elem = new XElement("li",
                 new XElement("a",
@@ -94,12 +100,5 @@ public partial class PostTreeNode : IValidatableObject
         }
 
         return elem;
-    }
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext ctx)
-    {
-        var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(Metadata)));
-        return list;
     }
 }

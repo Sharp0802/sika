@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Security;
+
 namespace BlogMan.Components;
 
 public static class SEH
@@ -23,10 +24,12 @@ public static class SEH
         {
             Logger.Log(LogLevel.FAIL, e, target?.ToString() ?? "<null>");
         }
+
         return false;
     }
 
-    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret) where TReturn : struct
+    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret)
+        where TReturn : struct
     {
         try
         {
@@ -45,11 +48,13 @@ public static class SEH
         {
             Logger.Log(LogLevel.FAIL, e, target?.ToString() ?? "<null>");
         }
+
         Unsafe.SkipInit(out ret);
         return false;
     }
 
-    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret) where TReturn : class
+    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret)
+        where TReturn : class
     {
         try
         {
@@ -68,6 +73,7 @@ public static class SEH
         {
             Logger.Log(LogLevel.FAIL, e, target?.ToString() ?? "<null>");
         }
+
         Unsafe.SkipInit(out ret);
         return false;
     }

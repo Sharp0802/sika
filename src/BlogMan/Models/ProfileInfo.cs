@@ -4,20 +4,19 @@ using YamlDotNet.Serialization;
 
 namespace BlogMan.Models;
 
-[Serializable, YamlSerializable]
+[Serializable]
+[YamlSerializable]
 public partial class ProfileInfo : IValidatableObject
 {
-    [Required(AllowEmptyStrings = false)]
-    public string UserName { get; set; }
-    
-    [Required(AllowEmptyStrings = false)]
-    public string ProfileImage { get; set; }
-
     public ProfileInfo(string name, string image)
     {
-        UserName = name;
+        UserName     = name;
         ProfileImage = image;
     }
+
+    [Required(AllowEmptyStrings = false)] public string UserName { get; set; }
+
+    [Required(AllowEmptyStrings = false)] public string ProfileImage { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {

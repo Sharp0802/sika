@@ -9,15 +9,15 @@ namespace BlogMan.Components;
 public static class Compiler
 {
     [field: ThreadStatic] private static MarkdownPipeline? _pipeline;
-    
+
     private static MarkdownPipeline Pipeline => _pipeline ??= new MarkdownPipelineBuilder()
-        .UseAdvancedExtensions()
-        .UseYamlFrontMatter()
-        .Build();
+                                                             .UseAdvancedExtensions()
+                                                             .UseYamlFrontMatter()
+                                                             .Build();
 
     public static bool Compile(Project proj)
     {
-        var total = 0;
+        var total   = 0;
         var success = 0;
         Logger.Log(LogLevel.INFO, "Compiling start", proj.Info.Name);
         Parallel.ForEach(EnumerateFiles(new DirectoryInfo(proj.Info.PostDirectory)), file =>
@@ -60,7 +60,7 @@ public static class Compiler
             if (!dstInfo.Exists) dstInfo.Create();
 
             var txt = File.ReadAllText(file);
-            var md = Markdown.Parse(txt, Pipeline);
+            var md  = Markdown.Parse(txt, Pipeline);
             Parallel.Invoke(
                 () =>
                 {
@@ -68,11 +68,11 @@ public static class Compiler
                     {
                         var yamlText = txt.Substring(yaml.Span.Start, yaml.Span.Length);
                         yamlText = yamlText
-                            .Split('\n')
-                            .Skip(1)
-                            .SkipLast(1)
-                            .Aggregate(new StringBuilder(), (builder, str) => builder.AppendLine(str))
-                            .ToString();
+                                  .Split('\n')
+                                  .Skip(1)
+                                  .SkipLast(1)
+                                  .Aggregate(new StringBuilder(), (builder, str) => builder.AppendLine(str))
+                                  .ToString();
                         File.WriteAllText(args.Yaml, yamlText, Encoding.UTF8);
                     }
                     else

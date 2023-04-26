@@ -14,14 +14,12 @@ namespace BlogMan.Components;
 
 public class Linker
 {
-    [ThreadStatic] private static IDeserializer? _deserializer;
+    [ThreadStatic] private static IDeserializer?             _deserializer;
+    private readonly              Dictionary<string, string> _escapedMap;
+    private readonly              Dictionary<string, string> _layoutMap;
 
-    private static IDeserializer Deserializer => _deserializer ??= new Deserializer();
-
-    private readonly Project _project;
+    private readonly Project  _project;
     private readonly PostTree _tree;
-    private readonly Dictionary<string, string> _escapedMap;
-    private readonly Dictionary<string, string> _layoutMap;
 
 
     private Linker(Project project)
@@ -53,13 +51,15 @@ public class Linker
         var wwwroot = Path.Combine(asmLoc, "wwwroot/");
         var resroot = Path.Combine(asmLoc, "Resources/");
         if (!_layoutMap.ContainsKey("default"))
-            _layoutMap.Add("default", File.ReadAllText(resroot + "post.razor")); 
+            _layoutMap.Add("default", File.ReadAllText(resroot + "post.razor"));
         CopyDirectory(wwwroot, project.Info.SiteDirectory, true);
     }
-    
+
+    private static IDeserializer Deserializer => _deserializer ??= new Deserializer();
+
     private static void CopyDirectory(string src, string dst, bool recurse)
     {
-        var dir = new DirectoryInfo(src);
+        var dir  = new DirectoryInfo(src);
         var dirs = dir.GetDirectories();
         Directory.CreateDirectory(dst);
 
@@ -72,7 +72,7 @@ public class Linker
         }
 
         if (!recurse) return;
-        
+
         foreach (var subDir in dirs)
         {
             var newDestinationDir = Path.Combine(dst, subDir.Name);
@@ -154,7 +154,7 @@ public class Linker
             var fname = Path.GetRelativePath(
                 _project.Info.BuildDirectory,
                 node.Parent is null && node.File.Name.Equals("Error.html", StringComparison.OrdinalIgnoreCase)
-                    ? Path.Combine(Path.GetDirectoryName(node.File.FullName)!, "404.html") 
+                    ? Path.Combine(Path.GetDirectoryName(node.File.FullName)!, "404.html")
                     : node.File.FullName);
             Console.WriteLine(fname);
             fname = Path.GetFullPath(fname, Path.GetFullPath(_project.Info.SiteDirectory));
@@ -171,16 +171,16 @@ public class Linker
     {
         var files = new DirectoryInfo(proj.Info.BuildDirectory).GetFiles("*.html");
         var welcome = files.SingleOrDefault(f => Path
-            .GetFileNameWithoutExtension(f.Name)
-            .Equals("welcome", StringComparison.OrdinalIgnoreCase));
+                                                .GetFileNameWithoutExtension(f.Name)
+                                                .Equals("welcome", StringComparison.OrdinalIgnoreCase));
         var error = files.SingleOrDefault(f => Path
-            .GetFileNameWithoutExtension(f.Name)
-            .Equals("error", StringComparison.OrdinalIgnoreCase));
+                                              .GetFileNameWithoutExtension(f.Name)
+                                              .Equals("error", StringComparison.OrdinalIgnoreCase));
         var roots = new DirectoryInfo(proj.Info.BuildDirectory)
-            .GetFileSystemInfos()
-            .Where(fs => (fs.Attributes & FileAttributes.Directory) != 0 || fs.FullName.EndsWith(".html"))
-            .Select(f => new PostTreeNode(f, null))
-            .ToArray();
+                   .GetFileSystemInfos()
+                   .Where(fs => (fs.Attributes & FileAttributes.Directory) != 0 || fs.FullName.EndsWith(".html"))
+                   .Select(f => new PostTreeNode(f, null))
+                   .ToArray();
 
         if (welcome is null)
         {
@@ -195,7 +195,7 @@ public class Linker
         }
 
         var welcomePage = new PostTreeNode(welcome, null);
-        var errorPage = new PostTreeNode(error, null);
+        var errorPage   = new PostTreeNode(error,   null);
 
         return new PostTree(welcomePage, errorPage, roots);
     }

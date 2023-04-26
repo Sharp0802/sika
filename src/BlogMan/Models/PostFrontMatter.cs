@@ -4,23 +4,30 @@ using YamlDotNet.Serialization;
 
 namespace BlogMan.Models;
 
-[Serializable, YamlSerializable]
+[Serializable]
+[YamlSerializable]
 public partial class PostFrontMatter : IValidatableObject
 {
-    [Required]
-    public string LCID { get; set; }
-    
-    [Required]
-    public string Layout { get; set; }
-    
-    [Required]
-    public string Title { get; set; }
+    public PostFrontMatter(string lcid, string layout, string title, DateTime[] timestamps, string[] topic)
+    {
+        LCID       = lcid;
+        Layout     = layout;
+        Title      = title;
+        Timestamps = timestamps;
+        Topic      = topic;
+    }
 
-    [Required, 
-     Obsolete($"Do NOT use this code directly. Use {nameof(Timestamps)} instead."), 
-     YamlMember(Alias = nameof(Timestamps))] 
+    [Required] public string LCID { get; set; }
+
+    [Required] public string Layout { get; set; }
+
+    [Required] public string Title { get; set; }
+
+    [Required]
+    [Obsolete($"Do NOT use this code directly. Use {nameof(Timestamps)} instead.")]
+    [YamlMember(Alias = nameof(Timestamps))]
     public string[] RawTimestamps { get; set; } = null!;
-    
+
     [YamlIgnore]
     public DateTime[] Timestamps
     {
@@ -30,17 +37,7 @@ public partial class PostFrontMatter : IValidatableObject
 #pragma warning restore CS0618
     }
 
-    [Required]
-    public string[] Topic { get; set; }
-
-    public PostFrontMatter(string lcid, string layout, string title, DateTime[] timestamps, string[] topic)
-    {
-        LCID = lcid;
-        Layout = layout;
-        Title = title;
-        Timestamps = timestamps;
-        Topic = topic;
-    }
+    [Required] public string[] Topic { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {

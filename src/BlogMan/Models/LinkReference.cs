@@ -4,20 +4,19 @@ using YamlDotNet.Serialization;
 
 namespace BlogMan.Models;
 
-[Serializable, YamlSerializable]
+[Serializable]
+[YamlSerializable]
 public partial class LinkReference : IValidatableObject
 {
-    [Required]
-    public string? HRef { get; set; }
-    
-    [Required]
-    public string? Name { get; set; }
-
     public LinkReference(string href, string name)
     {
         HRef = href;
         Name = name;
     }
+
+    [Required] public string? HRef { get; set; }
+
+    [Required] public string? Name { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
