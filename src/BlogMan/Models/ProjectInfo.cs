@@ -31,12 +31,12 @@ public partial class ProjectInfo : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
         var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(Name)));
-        list.AddRange(this.ValidateProperty(nameof(ApiVersion)));
-        list.AddRange(this.ValidateProperty(nameof(PostDirectory)));
-        list.AddRange(this.ValidateProperty(nameof(LayoutDirectory)));
-        list.AddRange(this.ValidateProperty(nameof(SiteDirectory)));
-        list.AddRange(this.ValidateProperty(nameof(BuildDirectory)));
+        list.AddRange(this.ValidateProperty(nameof(Name), typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(ApiVersion), typeof(Version)));
+        list.AddRange(this.ValidateProperty(nameof(PostDirectory), typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(LayoutDirectory), typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(SiteDirectory), typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(BuildDirectory), typeof(string)));
         return list;
     }
 }

@@ -28,7 +28,7 @@ public partial class PostTreeNode : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext ctx)
     {
         var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(Metadata)));
+        list.AddRange(this.ValidateProperty(nameof(Metadata), typeof(PostFrontMatter)));
         return list;
     }
 

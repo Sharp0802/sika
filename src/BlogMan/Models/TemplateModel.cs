@@ -34,11 +34,11 @@ public partial class TemplateModel : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
         var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(Layout)));
-        list.AddRange(this.ValidateProperty(nameof(Header)));
-        list.AddRange(this.ValidateProperty(nameof(Profile)));
-        list.AddRange(this.ValidateProperty(nameof(Contacts)));
-        list.AddRange(this.ValidateProperty(nameof(Html)));
+        list.AddRange(this.ValidateProperty(nameof(Layout), typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(Header), typeof(PostFrontMatter)));
+        list.AddRange(this.ValidateProperty(nameof(Profile), typeof(ProfileInfo)));
+        list.AddRange(this.ValidateProperty(nameof(Contacts), typeof(Contacts)));
+        list.AddRange(this.ValidateProperty(nameof(Html), typeof(PostTree)));
         return list;
     }
 }

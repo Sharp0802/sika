@@ -42,13 +42,13 @@ public partial class PostFrontMatter : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
         var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(LCID)));
-        list.AddRange(this.ValidateProperty(nameof(Layout)));
-        list.AddRange(this.ValidateProperty(nameof(Title)));
+        list.AddRange(this.ValidateProperty(nameof(LCID), typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(Layout), typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(Title), typeof(string)));
 #pragma warning disable CS0618
-        list.AddRange(this.ValidateProperty(nameof(RawTimestamps)));
+        list.AddRange(this.ValidateProperty(nameof(RawTimestamps), typeof(string[])));
 #pragma warning restore CS0618
-        list.AddRange(this.ValidateProperty(nameof(Topic)));
+        list.AddRange(this.ValidateProperty(nameof(Topic), typeof(string[])));
         return list;
     }
 }

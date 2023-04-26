@@ -14,15 +14,15 @@ public partial class LinkReference : IValidatableObject
         Name = name;
     }
 
-    [Required] public string? HRef { get; set; }
+    [Required] public string HRef { get; set; }
 
-    [Required] public string? Name { get; set; }
+    [Required] public string Name { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
         var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(HRef)));
-        list.AddRange(this.ValidateProperty(nameof(Name)));
+        list.AddRange(this.ValidateProperty(nameof(HRef), HRef.GetType()));
+        list.AddRange(this.ValidateProperty(nameof(Name), Name.GetType()));
         return list;
     }
 }

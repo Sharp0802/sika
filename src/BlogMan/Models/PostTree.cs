@@ -24,9 +24,9 @@ public partial class PostTree : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
         var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(WelcomePage)));
-        list.AddRange(this.ValidateProperty(nameof(ErrorPage)));
-        list.AddRange(this.ValidateProperty(nameof(Roots)));
+        list.AddRange(this.ValidateProperty(nameof(WelcomePage), typeof(PostTreeNode)));
+        list.AddRange(this.ValidateProperty(nameof(ErrorPage), typeof(PostTreeNode)));
+        list.AddRange(this.ValidateProperty(nameof(Roots), typeof(PostTreeNode[])));
         return list;
     }
 

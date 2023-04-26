@@ -7,26 +7,54 @@ namespace BlogMan.Components;
 public static class ValidationHelper
 {
     public static IEnumerable<ValidationResult> Validate<
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-        T>(this T obj)
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+        T>(
+        this T obj)
         where T : IValidatableObject
     {
-        var list = new List<ValidationResult>();
-        Validator.TryValidateObject(obj, new ValidationContext(obj, null, null), list, true);
-        return list;
+        return obj.Validate(null!);
+    }
+
+    private static object? GetDefaultValue(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+        Type t)
+    {
+        return t.IsValueType ? Activator.CreateInstance(t) : null;
     }
 
     public static IEnumerable<ValidationResult> ValidateProperty<
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-        T>(this T obj, string prop)
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+        T>(
+        this T obj,
+        string prop,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+        Type propT)
         where T : IValidatableObject
     {
-        var val = typeof(T)
-                 .GetProperty(prop, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                ?.GetValue(obj);
+        var info = typeof(T).GetProperty(prop, BindingFlags.Public | BindingFlags.Instance);
+        if (info is null || info.PropertyType != propT)
+            throw new InvalidProgramException();
 
         var list = new List<ValidationResult>();
-        Validator.TryValidateProperty(val, new ValidationContext(obj, null, null) { MemberName = prop }, list);
+
+        var val = info.GetValue(obj);
+        foreach (var attr in info.GetCustomAttributes())
+        {
+            if (attr is RequiredAttribute required)
+            {
+                if (required.DisallowAllDefaultValues && val == GetDefaultValue(propT))
+                {
+                    list.Add(new ValidationResult("Member cannot be default.", new[] { prop }));
+                    continue;
+                }
+
+                if (val is not string str)
+                    continue;
+                if (!required.AllowEmptyStrings && string.IsNullOrEmpty(str))
+                    list.Add(new ValidationResult("Member cannot be empty.", new[] { prop }));
+            }
+        }
+
         return list;
     }
 
