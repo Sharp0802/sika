@@ -1,7 +1,7 @@
 using System.CommandLine;
 using System.Reflection;
-using System.Xml;
-using System.Xml.Serialization;
+using System.Text.Json;
+using BlogMan.Contexts;
 using BlogMan.Models;
 using YamlDotNet.Serialization;
 
@@ -36,7 +36,7 @@ public static class Initializer
         var init = new Command("init", "Create a new project");
         init.AddOption(name);
         init.SetHandler(Init, name);
-        
+
         var clean = new Command("clean", "Clean the build directories of specific project");
         clean.AddOption(project);
         clean.SetHandler(Clean, project);
@@ -53,15 +53,13 @@ public static class Initializer
         return SEH.IO(project, static project =>
         {
             using var file = File.OpenRead(project.FullName);
-            using var reader = XmlReader.Create(file);
-            var serializer = new XmlSerializer(typeof(Project));
-            if (!serializer.CanDeserialize(reader))
+
+            var data = JsonSerializer.Deserialize(file, SourceGenerationContext.Default.Project);
+            if (data is null)
             {
                 Logger.Log(LogLevel.FAIL, "Cannot deserialize project file", project.FullName);
                 return null;
             }
-
-            var data = (Project)serializer.Deserialize(reader)!;
 
             var errors = data.Validate().ToArray();
             if (errors.Length != 0)
@@ -71,7 +69,9 @@ public static class Initializer
             }
 
             return data;
-        }, out var data) ? data : null;
+        }, out var data)
+            ? data
+            : null;
     }
 
     private static void Compile(FileInfo project)
@@ -106,24 +106,27 @@ public static class Initializer
                 Logger.Log(LogLevel.FAIL, "File already exists", file.FullName);
                 return;
             }
-            
-            using var writer = file.CreateText();
-            
-            new XmlSerializer(typeof(Project)).Serialize(writer, new Project(
-                new ProjectInfo(
-                    name, 
-                    Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(0, 0, 0), 
-                    "post/", 
-                    "layout/", 
-                    "site/", 
-                    "build/"),
-                new ProfileInfo(
-                    "your-name", 
-                    "thumbnail-here"),
-                new Contacts(
-                    "your-github-link", 
-                    "your-email", 
-                    Array.Empty<LinkReference>())));
+
+            using var writer = file.OpenRead();
+
+            JsonSerializer.Serialize(
+                writer,
+                new Project(
+                    new ProjectInfo(
+                        name,
+                        Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(0, 0, 0),
+                        "post/",
+                        "layout/",
+                        "site/",
+                        "build/"),
+                    new ProfileInfo(
+                        "your-name",
+                        "thumbnail-here"),
+                    new Contacts(
+                        "your-github-link",
+                        "your-email",
+                        Array.Empty<LinkReference>())),
+                SourceGenerationContext.Default.Project);
         });
     }
 
@@ -137,7 +140,7 @@ public static class Initializer
         {
             if (!Directory.Exists(data.Info.PostDirectory))
                 Directory.CreateDirectory(data.Info.PostDirectory);
-            
+
             if (file.Exists)
             {
                 Logger.Log(LogLevel.FAIL, "File already exists", file.FullName);
@@ -147,14 +150,14 @@ public static class Initializer
             using var writer = file.CreateText();
 
             writer.Write("---\n");
-            
+
             new Serializer().Serialize(writer, new PostFrontMatter(
                 "en-us",
                 "default",
                 name,
                 new[] { DateTime.Now },
                 Array.Empty<string>()));
-            
+
             writer.Write($"---\n\n# {name}\n");
         });
     }
