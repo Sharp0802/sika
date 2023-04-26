@@ -6,8 +6,6 @@ namespace BlogMan.Components;
 
 public static class ValidationHelper
 {
-    [SuppressMessage("Trimming",
-        "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic access otherwise can break functionality when trimming application code")]
     public static IEnumerable<ValidationResult> Validate<
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
         T>(this T obj)
@@ -23,17 +21,19 @@ public static class ValidationHelper
         T>(this T obj, string prop)
         where T : IValidatableObject
     {
-        var val = obj
-            .GetType()
-            .GetProperty(prop, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-            ?.GetValue(obj);
+        var val = typeof(T)
+                 .GetProperty(prop, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.GetValue(obj);
 
         var list = new List<ValidationResult>();
         Validator.TryValidateProperty(val, new ValidationContext(obj, null, null) { MemberName = prop }, list);
         return list;
     }
 
-    public static void PrintErrors(this IEnumerable<ValidationResult> results, string target, LogLevel level = LogLevel.FAIL)
+    public static void PrintErrors(
+        this IEnumerable<ValidationResult> results,
+        string                             target,
+        LogLevel                           level = LogLevel.FAIL)
     {
         Logger.Log(level,
             $"""
