@@ -93,7 +93,7 @@ public static class Compiler
                         Logger.Log(LogLevel.WARN, "Yaml front-matter not found.", file);
                     }
                 },
-                () => File.WriteAllText(args.Html, md.ToHtml(Pipeline), Encoding.UTF8)
+                () => File.WriteAllText(args.Html, txt, Encoding.UTF8)
             );
             if (exception is not null)
                 throw exception;

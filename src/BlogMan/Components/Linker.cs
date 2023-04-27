@@ -1,18 +1,19 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using AngleSharp;
-using AngleSharp.Html;
-using AngleSharp.Html.Dom;
-using AngleSharp.Html.Parser;
 using BlogMan.Models;
+using Markdig;
 using RazorEngine;
 using RazorEngine.Templating;
 using Encoding = System.Text.Encoding;
 
 namespace BlogMan.Components;
 
-public class Linker
+public sealed class Linker : IDisposable
 {
+    private readonly ThreadLocal<MarkdownPipeline> _pipeline = new();
+
+    private MarkdownPipeline Pipeline => _pipeline.Value!;
+
     private readonly Dictionary<string, string> _escapedMap;
     private readonly Dictionary<string, string> _layoutMap;
 
@@ -51,6 +52,26 @@ public class Linker
         if (!_layoutMap.ContainsKey("default"))
             _layoutMap.Add("default", File.ReadAllText(resroot + "post.razor"));
         CopyDirectory(wwwroot, project.Info.SiteDirectory, true);
+
+
+        _pipeline.Value = new MarkdownPipelineBuilder()
+                         .UseAdvancedExtensions()
+                         .UseYamlFrontMatter()
+                         .UseUrlRewriter(url =>
+                          {
+                              if (url is null || !url.IsShortcut)
+                                  return url?.UnescapedUrl.Text;
+
+                              var t = url.UnescapedUrl.Text;
+                              if (t.StartsWith("ref:"))
+                                  t = t[4..];
+                              if (_escapedMap.ContainsKey(t))
+                                  t = _escapedMap[t];
+                              else
+                                  Logger.Log(LogLevel.WARN, $"Post '{t}' not found.");
+                              return t;
+                          })
+                         .Build();
     }
 
     private static void CopyDirectory(string src, string dst, bool recurse)
@@ -93,19 +114,8 @@ public class Linker
         Unsafe.SkipInit(out string html);
         var ior = SEH.IO(node.File, info =>
         {
-            using var file = File.OpenRead(info.FullName);
-            using var docs = new HtmlParser().ParseDocument(file);
-            foreach (var link in docs.QuerySelectorAll("a").OfType<IHtmlLinkElement>())
-            {
-                if (link.Href is null || !link.Href.StartsWith("ref:")) continue;
-                var href = link.Href[4..];
-                if (_escapedMap.ContainsKey(href!))
-                    link.Href = _escapedMap[href];
-                else
-                    Logger.Log(LogLevel.WARN, $"Post '{href}' not found.");
-            }
-
-            html = docs.ToHtml(new PrettyMarkupFormatter());
+            var file = File.ReadAllText(info.FullName);
+            html = Markdown.ToHtml(file, Pipeline);
         });
         if (!ior)
             return false;
@@ -194,5 +204,10 @@ public class Linker
         var errorPage   = new PostTreeNode(error,   null);
 
         return new PostTree(welcomePage, errorPage, roots);
+    }
+
+    public void Dispose()
+    {
+        _pipeline.Dispose();
     }
 }
