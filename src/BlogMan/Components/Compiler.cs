@@ -59,8 +59,9 @@ public static class Compiler
             var dstInfo = new DirectoryInfo(Path.GetDirectoryName(dst)!);
             if (!dstInfo.Exists) dstInfo.Create();
 
-            var txt = File.ReadAllText(file);
-            var md  = Markdown.Parse(txt, Pipeline);
+            var        txt       = File.ReadAllText(file);
+            var        md        = Markdown.Parse(txt, Pipeline);
+            Exception? exception = null;
             Parallel.Invoke(
                 () =>
                 {
@@ -73,6 +74,18 @@ public static class Compiler
                                   .SkipLast(1)
                                   .Aggregate(new StringBuilder(), (builder, str) => builder.AppendLine(str))
                                   .ToString();
+
+                        try
+                        {
+                            using var reader = new StringReader(yamlText);
+                            if (Yaml.Deserialize<PostFrontMatter?>(reader) is null)
+                                throw new InvalidDataException("Invalid post front matter detected.");
+                        }
+                        catch (Exception e)
+                        {
+                            exception = e;
+                        }
+                        
                         File.WriteAllText(args.Yaml, yamlText, Encoding.UTF8);
                     }
                     else
@@ -82,6 +95,8 @@ public static class Compiler
                 },
                 () => File.WriteAllText(args.Html, md.ToHtml(Pipeline), Encoding.UTF8)
             );
+            if (exception is not null)
+                throw exception;
         });
     }
 }

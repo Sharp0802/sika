@@ -12,13 +12,13 @@ public static class SEH
             io?.Invoke(target);
             return true;
         }
-        catch (IOException)
+        catch (IOException e)
         {
-            Logger.Log(LogLevel.FAIL, "IO operation failed", target?.ToString() ?? "<null>");
+            Logger.Log(LogLevel.FAIL, $"IO operation failed: {e.Message}", target?.ToString() ?? "<null>");
         }
         catch (Exception e) when (e is SecurityException or UnauthorizedAccessException)
         {
-            Logger.Log(LogLevel.FAIL, "Unauthorized IO operation", target?.ToString() ?? "<null>");
+            Logger.Log(LogLevel.FAIL, $"Unauthorized IO operation: {e.Message}", target?.ToString() ?? "<null>");
         }
         catch (Exception e)
         {
@@ -36,13 +36,13 @@ public static class SEH
             ret = io?.Invoke(target);
             return true;
         }
-        catch (IOException)
+        catch (IOException e)
         {
-            Logger.Log(LogLevel.FAIL, "IO operation failed", target?.ToString() ?? "<null>");
+            Logger.Log(LogLevel.FAIL, $"IO operation failed: {e.Message}", target?.ToString() ?? "<null>");
         }
         catch (Exception e) when (e is SecurityException or UnauthorizedAccessException)
         {
-            Logger.Log(LogLevel.FAIL, "Unauthorized IO operation", target?.ToString() ?? "<null>");
+            Logger.Log(LogLevel.FAIL, $"Unauthorized IO operation: {e.Message}", target?.ToString() ?? "<null>");
         }
         catch (Exception e)
         {
