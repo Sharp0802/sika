@@ -19,13 +19,9 @@ public static class Initializer
             IsRequired = true
         };
 
-        var compile = new Command("compile", "Compile the specific project");
-        compile.AddOption(project);
-        compile.SetHandler(Compile, project);
-
-        var link = new Command("link", "Link the specific project");
-        link.AddOption(project);
-        link.SetHandler(Link, project);
+        var build = new Command("build", "Build the specific project");
+        build.AddOption(project);
+        build.SetHandler(Build, project);
 
         var @new = new Command("new", "Create a new post");
         @new.AddOption(project);
@@ -40,8 +36,7 @@ public static class Initializer
         clean.AddOption(project);
         clean.SetHandler(Clean, project);
 
-        root.AddCommand(compile);
-        root.AddCommand(link);
+        root.AddCommand(build);
         root.AddCommand(@new);
         root.AddCommand(init);
         root.AddCommand(clean);
@@ -73,22 +68,20 @@ public static class Initializer
             : null;
     }
 
-    private static void Compile(FileInfo project)
+    private static void Build(FileInfo project)
     {
         var data = ReadProject(project);
         if (data is null)
             return;
-        if (Compiler.Compile(data))
-            Logger.Log(LogLevel.CMPL, "Complete compiling project");
+        
+        if (Preprocessor.Compile(data))
+            Logger.Log(LogLevel.CMPL, "Complete preprocessing project");
         else
-            Logger.Log(LogLevel.FAIL, "Failed to compile project");
-    }
-
-    private static void Link(FileInfo project)
-    {
-        var data = ReadProject(project);
-        if (data is null)
+        {
+            Logger.Log(LogLevel.FAIL, "Failed to preprocess project");
             return;
+        }
+        
         if (Linker.Link(data))
             Logger.Log(LogLevel.CMPL, "Complete compiling project");
         else

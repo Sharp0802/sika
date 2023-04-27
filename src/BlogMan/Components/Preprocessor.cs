@@ -6,7 +6,7 @@ using Markdig.Syntax;
 
 namespace BlogMan.Components;
 
-public static class Compiler
+public static class Preprocessor
 {
     [field: ThreadStatic] private static MarkdownPipeline? _pipeline;
 
@@ -19,19 +19,19 @@ public static class Compiler
     {
         var total   = 0;
         var success = 0;
-        Logger.Log(LogLevel.INFO, "Compiling start", proj.Info.Name);
+        Logger.Log(LogLevel.INFO, "Preprocessing start", proj.Info.Name);
         Parallel.ForEach(EnumerateFiles(new DirectoryInfo(proj.Info.PostDirectory)), file =>
         {
-            Logger.Log(LogLevel.INFO, "Compiling start", file.FullName);
+            Logger.Log(LogLevel.INFO, "Preprocessing start", file.FullName);
             Interlocked.Increment(ref total);
             if (Compile(file.FullName, proj))
             {
                 Interlocked.Increment(ref success);
-                Logger.Log(LogLevel.CMPL, "Success to compile", file.FullName);
+                Logger.Log(LogLevel.CMPL, "Success to preprocess", file.FullName);
             }
             else
             {
-                Logger.Log(LogLevel.FAIL, "Failed to compile", file.FullName);
+                Logger.Log(LogLevel.FAIL, "Failed to preprocess", file.FullName);
             }
         });
 

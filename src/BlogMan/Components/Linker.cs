@@ -157,11 +157,16 @@ public sealed class Linker : IDisposable
 
         ior = SEH.IO((object)null!, _ =>
         {
-            var fname = Path.GetRelativePath(
-                _project.Info.BuildDirectory,
-                node.Parent is null && node.File.Name.Equals("Error.md", StringComparison.OrdinalIgnoreCase)
-                    ? Path.Combine(Path.GetDirectoryName(node.File.FullName)!, "404.md")
-                    : node.File.FullName);
+            var fdir = node.Parent is null
+                ? node.File.Name switch
+                {
+                    "Error.md"   => Path.Combine(Path.GetDirectoryName(node.File.FullName)!, "404.md"),
+                    "Welcome.md" => Path.Combine(Path.GetDirectoryName(node.File.FullName)!, "index.md"),
+                    _            => node.File.FullName
+                }
+                : node.File.FullName;
+
+            var fname = Path.GetRelativePath(_project.Info.BuildDirectory, fdir);
             fname = Path.ChangeExtension(fname, ".html");
             Console.WriteLine(fname);
             fname = Path.GetFullPath(fname, Path.GetFullPath(_project.Info.SiteDirectory));
