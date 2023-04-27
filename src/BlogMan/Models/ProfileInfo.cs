@@ -1,29 +1,28 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using BlogMan.Components;
-using YamlDotNet.Serialization;
 
 namespace BlogMan.Models;
 
-[Serializable, YamlSerializable]
+[Serializable]
 public partial class ProfileInfo : IValidatableObject
 {
-    [Required(AllowEmptyStrings = false)]
-    public string UserName { get; set; }
-    
-    [Required(AllowEmptyStrings = false)]
-    public string ProfileImage { get; set; }
-
-    public ProfileInfo(string name, string image)
+    [JsonConstructor]
+    public ProfileInfo(string userName, string profileImage)
     {
-        UserName = name;
-        ProfileImage = image;
+        UserName     = userName;
+        ProfileImage = profileImage;
     }
+
+    [Required] public string UserName { get; set; }
+
+    [Required] public string ProfileImage { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
         var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(UserName)));
-        list.AddRange(this.ValidateProperty(nameof(ProfileImage)));
+        list.AddRange(this.ValidateProperty(nameof(UserName), typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(ProfileImage), typeof(string)));
         return list;
     }
 }

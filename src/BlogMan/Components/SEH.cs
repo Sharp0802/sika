@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Security;
+
 namespace BlogMan.Components;
 
 public static class SEH
@@ -11,45 +12,49 @@ public static class SEH
             io?.Invoke(target);
             return true;
         }
-        catch (IOException)
+        catch (IOException e)
         {
-            Logger.Log(LogLevel.FAIL, "IO operation failed", target?.ToString() ?? "<null>");
+            Logger.Log(LogLevel.FAIL, $"IO operation failed: {e.Message}", target?.ToString() ?? "<null>");
         }
         catch (Exception e) when (e is SecurityException or UnauthorizedAccessException)
         {
-            Logger.Log(LogLevel.FAIL, "Unauthorized IO operation", target?.ToString() ?? "<null>");
+            Logger.Log(LogLevel.FAIL, $"Unauthorized IO operation: {e.Message}", target?.ToString() ?? "<null>");
         }
         catch (Exception e)
         {
             Logger.Log(LogLevel.FAIL, e, target?.ToString() ?? "<null>");
         }
+
         return false;
     }
 
-    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret) where TReturn : struct
+    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret)
+        where TReturn : struct
     {
         try
         {
             ret = io?.Invoke(target);
             return true;
         }
-        catch (IOException)
+        catch (IOException e)
         {
-            Logger.Log(LogLevel.FAIL, "IO operation failed", target?.ToString() ?? "<null>");
+            Logger.Log(LogLevel.FAIL, $"IO operation failed: {e.Message}", target?.ToString() ?? "<null>");
         }
         catch (Exception e) when (e is SecurityException or UnauthorizedAccessException)
         {
-            Logger.Log(LogLevel.FAIL, "Unauthorized IO operation", target?.ToString() ?? "<null>");
+            Logger.Log(LogLevel.FAIL, $"Unauthorized IO operation: {e.Message}", target?.ToString() ?? "<null>");
         }
         catch (Exception e)
         {
             Logger.Log(LogLevel.FAIL, e, target?.ToString() ?? "<null>");
         }
+
         Unsafe.SkipInit(out ret);
         return false;
     }
 
-    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret) where TReturn : class
+    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret)
+        where TReturn : class
     {
         try
         {
@@ -68,6 +73,7 @@ public static class SEH
         {
             Logger.Log(LogLevel.FAIL, e, target?.ToString() ?? "<null>");
         }
+
         Unsafe.SkipInit(out ret);
         return false;
     }

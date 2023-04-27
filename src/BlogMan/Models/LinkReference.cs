@@ -1,29 +1,28 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using BlogMan.Components;
-using YamlDotNet.Serialization;
 
 namespace BlogMan.Models;
 
-[Serializable, YamlSerializable]
+[Serializable]
 public partial class LinkReference : IValidatableObject
 {
-    [Required]
-    public string? HRef { get; set; }
-    
-    [Required]
-    public string? Name { get; set; }
-
+    [JsonConstructor]
     public LinkReference(string href, string name)
     {
         HRef = href;
         Name = name;
     }
 
+    [Required] public string HRef { get; set; }
+
+    [Required] public string Name { get; set; }
+
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
         var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(HRef)));
-        list.AddRange(this.ValidateProperty(nameof(Name)));
+        list.AddRange(this.ValidateProperty(nameof(HRef), HRef.GetType()));
+        list.AddRange(this.ValidateProperty(nameof(Name), Name.GetType()));
         return list;
     }
 }

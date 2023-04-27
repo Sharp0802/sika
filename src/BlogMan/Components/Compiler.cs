@@ -9,15 +9,15 @@ namespace BlogMan.Components;
 public static class Compiler
 {
     [field: ThreadStatic] private static MarkdownPipeline? _pipeline;
-    
+
     private static MarkdownPipeline Pipeline => _pipeline ??= new MarkdownPipelineBuilder()
-        .UseAdvancedExtensions()
-        .UseYamlFrontMatter()
-        .Build();
+                                                             .UseAdvancedExtensions()
+                                                             .UseYamlFrontMatter()
+                                                             .Build();
 
     public static bool Compile(Project proj)
     {
-        var total = 0;
+        var total   = 0;
         var success = 0;
         Logger.Log(LogLevel.INFO, "Compiling start", proj.Info.Name);
         Parallel.ForEach(EnumerateFiles(new DirectoryInfo(proj.Info.PostDirectory)), file =>
@@ -52,36 +52,39 @@ public static class Compiler
         var dst = Path.GetRelativePath(proj.Info.PostDirectory, file);
         dst = Path.GetFullPath(dst, Path.GetFullPath(proj.Info.BuildDirectory));
         var dstYaml = Path.ChangeExtension(dst, ".yaml");
-        var dstHtml = Path.ChangeExtension(dst, ".html");
+        var dstHtml = Path.ChangeExtension(dst, ".md");
 
         return SEH.IO((Yaml: dstYaml, Html: dstHtml), args =>
         {
             var dstInfo = new DirectoryInfo(Path.GetDirectoryName(dst)!);
             if (!dstInfo.Exists) dstInfo.Create();
 
-            var txt = File.ReadAllText(file);
-            var md = Markdown.Parse(txt, Pipeline);
-            Parallel.Invoke(
-                () =>
-                {
-                    if (md.Descendants<YamlFrontMatterBlock>().FirstOrDefault() is { } yaml)
-                    {
-                        var yamlText = txt.Substring(yaml.Span.Start, yaml.Span.Length);
-                        yamlText = yamlText
-                            .Split('\n')
-                            .Skip(1)
-                            .SkipLast(1)
-                            .Aggregate(new StringBuilder(), (builder, str) => builder.AppendLine(str))
-                            .ToString();
-                        File.WriteAllText(args.Yaml, yamlText, Encoding.UTF8);
-                    }
-                    else
-                    {
-                        Logger.Log(LogLevel.WARN, "Yaml front-matter not found.", file);
-                    }
-                },
-                () => File.WriteAllText(args.Html, md.ToHtml(Pipeline), Encoding.UTF8)
-            );
+            var        txt       = File.ReadAllText(file);
+            var        md        = Markdown.Parse(txt, Pipeline);
+
+            if (md.Descendants<YamlFrontMatterBlock>().FirstOrDefault() is { } yaml)
+            {
+                var yamlText = txt.Substring(yaml.Span.Start, yaml.Span.Length);
+                yamlText = yamlText
+                          .Split('\n')
+                          .Skip(1)
+                          .SkipLast(1)
+                          .Aggregate(new StringBuilder(), (builder, str) => builder.AppendLine(str))
+                          .ToString();
+
+                using var reader = new StringReader(yamlText);
+                if (Yaml.Deserialize<PostFrontMatter?>(reader) is null)
+                    throw new InvalidDataException("Invalid post front matter detected.");
+
+                File.WriteAllText(args.Yaml, yamlText,            Encoding.UTF8);
+
+                txt = txt.Remove(yaml.Span.Start, yaml.Span.Length);
+                File.WriteAllText(args.Html, txt, Encoding.UTF8);
+            }
+            else
+            {
+                throw new FileNotFoundException("Yaml front-matter not found.");
+            }
         });
     }
 }

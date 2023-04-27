@@ -13,7 +13,8 @@ public static class Logger
 {
     private static readonly object LockHandle = new();
 
-    private static readonly ConsoleColor[] Colors = {
+    private static readonly ConsoleColor[] Colors =
+    {
         ConsoleColor.Red,
         ConsoleColor.DarkRed,
         ConsoleColor.Yellow,
@@ -21,12 +22,13 @@ public static class Logger
         ConsoleColor.Green
     };
 
-    private static readonly string[] Headers = {
+    private static readonly string[] Headers =
+    {
         "crit",
         "fail",
         "warn",
         "info",
-        "cmpl",
+        "cmpl"
     };
 
     public static void Log(LogLevel lv, string msg)
