@@ -74,7 +74,7 @@ public static class Initializer
         if (data is null)
             return;
         
-        if (Compiler.Compile(data))
+        if (Preprocessor.Compile(data))
             Logger.Log(LogLevel.CMPL, "Complete preprocessing project");
         else
         {
