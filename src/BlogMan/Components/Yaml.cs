@@ -8,13 +8,9 @@ public static class Yaml
     [ThreadStatic] private static ISerializer?   _sIO;
     [ThreadStatic] private static IDeserializer? _dIO;
 
-    private static ISerializer Serializer => _sIO ??= new SerializerBuilder()
-                                                     .WithNamingConvention(HyphenatedNamingConvention.Instance)
-                                                     .Build();
+    private static ISerializer Serializer => _sIO ??= new SerializerBuilder().Build();
 
-    private static IDeserializer Deserializer => _dIO ??= new DeserializerBuilder()
-                                                         .WithNamingConvention(HyphenatedNamingConvention.Instance)
-                                                         .Build();
+    private static IDeserializer Deserializer => _dIO ??= new DeserializerBuilder().Build();
 
     public static void Serialize<T>(TextWriter writer, T obj)
     {
