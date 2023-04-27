@@ -150,12 +150,14 @@ public static class Initializer
 
             writer.Write("---\n");
 
-            new Serializer().Serialize(writer, new PostFrontMatter(
-                "en-us",
-                "default",
-                name,
-                new[] { DateTime.Now },
-                Array.Empty<string>()));
+            Yaml.Serialize(
+                writer,
+                new PostFrontMatter(
+                    "en-us",
+                    "default",
+                    name,
+                    new[] { DateTime.Now },
+                    Array.Empty<string>()));
 
             writer.Write($"---\n\n# {name}\n");
         });

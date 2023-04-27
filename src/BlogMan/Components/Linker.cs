@@ -7,16 +7,14 @@ using AngleSharp.Html.Parser;
 using BlogMan.Models;
 using RazorEngine;
 using RazorEngine.Templating;
-using YamlDotNet.Serialization;
 using Encoding = System.Text.Encoding;
 
 namespace BlogMan.Components;
 
 public class Linker
 {
-    [ThreadStatic] private static IDeserializer?             _deserializer;
-    private readonly              Dictionary<string, string> _escapedMap;
-    private readonly              Dictionary<string, string> _layoutMap;
+    private readonly Dictionary<string, string> _escapedMap;
+    private readonly Dictionary<string, string> _layoutMap;
 
     private readonly Project  _project;
     private readonly PostTree _tree;
@@ -54,8 +52,6 @@ public class Linker
             _layoutMap.Add("default", File.ReadAllText(resroot + "post.razor"));
         CopyDirectory(wwwroot, project.Info.SiteDirectory, true);
     }
-
-    private static IDeserializer Deserializer => _deserializer ??= new Deserializer();
 
     private static void CopyDirectory(string src, string dst, bool recurse)
     {
@@ -128,7 +124,7 @@ public class Linker
         {
             using var yamlStream = File.OpenRead(name);
             using var yamlReader = new StreamReader(yamlStream, Encoding.UTF8);
-            metadata = Deserializer.Deserialize<PostFrontMatter>(yamlReader);
+            metadata = Yaml.Deserialize<PostFrontMatter>(yamlReader);
         });
         if (!ior)
             return false;
