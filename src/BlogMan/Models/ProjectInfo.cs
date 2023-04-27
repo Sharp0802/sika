@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using BlogMan.Components;
 
 namespace BlogMan.Models;
@@ -6,14 +7,21 @@ namespace BlogMan.Models;
 [Serializable]
 public partial class ProjectInfo : IValidatableObject
 {
-    public ProjectInfo(string name, Version version, string post, string layout, string site, string build)
+    [JsonConstructor]
+    public ProjectInfo(
+        string name, 
+        Version apiVersion, 
+        string postDirectory, 
+        string layoutDirectory, 
+        string siteDirectory, 
+        string buildDirectory)
     {
         Name            = name;
-        ApiVersion      = version;
-        PostDirectory   = post;
-        LayoutDirectory = layout;
-        SiteDirectory   = site;
-        BuildDirectory  = build;
+        ApiVersion      = apiVersion;
+        PostDirectory   = postDirectory;
+        LayoutDirectory = layoutDirectory;
+        SiteDirectory   = siteDirectory;
+        BuildDirectory  = buildDirectory;
     }
 
     [Required] public string Name { get; set; }

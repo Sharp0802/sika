@@ -3,9 +3,7 @@ using BlogMan.Models;
 
 namespace BlogMan.Contexts;
 
-[JsonSourceGenerationOptions(
-    WriteIndented = true,
-    PropertyNamingPolicy = JsonKnownNamingPolicy.KebabCaseLower)]
+[JsonSourceGenerationOptions(WriteIndented = true, IncludeFields = true)]
 [JsonSerializable(typeof(Project))]
 [JsonSerializable(typeof(Contacts))]
 [JsonSerializable(typeof(LinkReference))]

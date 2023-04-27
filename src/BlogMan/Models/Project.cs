@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using BlogMan.Components;
 
 namespace BlogMan.Models;
@@ -6,6 +7,7 @@ namespace BlogMan.Models;
 [Serializable]
 public partial class Project : IValidatableObject
 {
+    [JsonConstructor]
     public Project(ProjectInfo info, ProfileInfo profile, Contacts contacts)
     {
         Info     = info;

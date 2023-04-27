@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Text.Json;
 using BlogMan.Contexts;
 using BlogMan.Models;
-using YamlDotNet.Serialization;
 
 namespace BlogMan.Components;
 
@@ -98,7 +97,7 @@ public static class Initializer
 
     private static void Init(string name)
     {
-        var file = new FileInfo($"{name}.blog.xml");
+        var file = new FileInfo($"{name}.blog.json");
         SEH.IO(file, _ =>
         {
             if (file.Exists)
@@ -107,7 +106,7 @@ public static class Initializer
                 return;
             }
 
-            using var writer = file.OpenRead();
+            using var writer = file.Create();
 
             JsonSerializer.Serialize(
                 writer,

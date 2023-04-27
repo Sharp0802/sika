@@ -1,13 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using BlogMan.Components;
-using YamlDotNet.Serialization;
 
 namespace BlogMan.Models;
 
 [Serializable]
-[YamlSerializable]
 public partial class HeaderInfo : IValidatableObject
 {
+    [JsonConstructor]
     public HeaderInfo(string title, string[] topics, DateTime[] timestamps)
     {
         Title      = title;

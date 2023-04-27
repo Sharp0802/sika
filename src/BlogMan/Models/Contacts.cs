@@ -1,13 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using BlogMan.Components;
-using YamlDotNet.Serialization;
 
 namespace BlogMan.Models;
 
 [Serializable]
-[YamlSerializable]
 public partial class Contacts : IValidatableObject
 {
+    [JsonConstructor]
     public Contacts(string github, string email, LinkReference[] misc)
     {
         GitHub = github;

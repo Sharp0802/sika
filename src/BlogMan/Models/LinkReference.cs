@@ -1,13 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using BlogMan.Components;
-using YamlDotNet.Serialization;
 
 namespace BlogMan.Models;
 
 [Serializable]
-[YamlSerializable]
 public partial class LinkReference : IValidatableObject
 {
+    [JsonConstructor]
     public LinkReference(string href, string name)
     {
         HRef = href;
