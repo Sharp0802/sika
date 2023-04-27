@@ -1,8 +1,9 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using BlogMan.Contexts;
 using BlogMan.Models;
 using Markdig;
-using RazorEngine;
+using RazorEngine.Configuration;
 using RazorEngine.Templating;
 using Encoding = System.Text.Encoding;
 
@@ -19,8 +20,20 @@ public sealed class Linker : IDisposable
 
     private readonly Project  _project;
     private readonly PostTree _tree;
+    
+    private static IRazorEngineService RazorService { get; }
 
+    static Linker()
+    {
+        var config = new TemplateServiceConfiguration
+        {
+            ReferenceResolver = new RazorReferenceResolver()
+        };
+        RazorService = RazorEngineService.Create(config);
 
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => RazorService.Dispose();
+    }
+    
     private Linker(Project project)
     {
         if (!Directory.Exists(project.Info.SiteDirectory))
@@ -149,7 +162,7 @@ public sealed class Linker : IDisposable
 
         node.Metadata = metadata;
 
-        html = Engine.Razor.RunCompile(
+        html = RazorService.RunCompile(
             _layoutMap[metadata.Layout],
             Guid.NewGuid().ToString(),
             typeof(TemplateModel),
