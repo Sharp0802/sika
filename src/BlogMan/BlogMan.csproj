@@ -9,11 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <TrimmerRootDescriptor Include="Resources/TrimmerRoots.xml"/>
+        <TrimmerRootDescriptor Include="Resources/TrimmerRoots.xml" />
     </ItemGroup>
-    <PropertyGroup>
-        <PublishTrimmed>true</PublishTrimmed>
-    </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="../BlogMan.Generator/BlogMan.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
