@@ -25,6 +25,10 @@ public partial class PostTreeNode : IValidatableObject
 
     public PostTreeNode? Parent { get; }
 
+    private string Name => (File.Attributes & FileAttributes.Directory) != 0
+        ? File.Name
+        : Path.ChangeExtension(File.Name, ".html");
+
     public IEnumerable<ValidationResult> Validate(ValidationContext ctx)
     {
         var list = new List<ValidationResult>();
@@ -47,12 +51,12 @@ public partial class PostTreeNode : IValidatableObject
 
     public string GetIdentifier()
     {
-        return string.Join('/', GetUpperBranch().Select(node => node.File.Name));
+        return string.Join('/', GetUpperBranch().Select(node => node.Name));
     }
 
     public string GetEscapedIdentifier()
     {
-        return string.Join("__", GetUpperBranch().Select(node => node.File.Name));
+        return string.Join("__", GetUpperBranch().Select(node => node.Name));
     }
 
     public IEnumerable<PostTreeNode> GetAllFile()
@@ -73,7 +77,7 @@ public partial class PostTreeNode : IValidatableObject
         {
             if (Metadata is null)
                 return null;
-            if (Parent is null && File.Name.Equals("Error.html", StringComparison.OrdinalIgnoreCase))
+            if (Parent is null && Name.Equals("Error.html", StringComparison.OrdinalIgnoreCase))
                 return null;
 
             var id = HttpUtility.HtmlAttributeEncode(GetEscapedIdentifier());
@@ -93,7 +97,7 @@ public partial class PostTreeNode : IValidatableObject
             elem = new XElement("li",
                 new XElement("span",
                     new XAttribute("class", "caret"),
-                    new XText(Path.GetFileNameWithoutExtension(File.Name))
+                    new XText(Path.GetFileNameWithoutExtension(Name))
                 ),
                 ul
             );

@@ -115,7 +115,7 @@ public sealed class Linker : IDisposable
         var ior = SEH.IO(node.File, info =>
         {
             var file = File.ReadAllText(info.FullName);
-            html = Markdown.ToHtml(file, Pipeline);
+            html = Markdown.Parse(file, Pipeline).ToHtml(Pipeline);
         });
         if (!ior)
             return false;
@@ -159,9 +159,10 @@ public sealed class Linker : IDisposable
         {
             var fname = Path.GetRelativePath(
                 _project.Info.BuildDirectory,
-                node.Parent is null && node.File.Name.Equals("Error.html", StringComparison.OrdinalIgnoreCase)
-                    ? Path.Combine(Path.GetDirectoryName(node.File.FullName)!, "404.html")
+                node.Parent is null && node.File.Name.Equals("Error.md", StringComparison.OrdinalIgnoreCase)
+                    ? Path.Combine(Path.GetDirectoryName(node.File.FullName)!, "404.md")
                     : node.File.FullName);
+            fname = Path.ChangeExtension(fname, ".html");
             Console.WriteLine(fname);
             fname = Path.GetFullPath(fname, Path.GetFullPath(_project.Info.SiteDirectory));
             Console.WriteLine(fname);
@@ -175,7 +176,7 @@ public sealed class Linker : IDisposable
 
     private static PostTree? BuildTree(Project proj)
     {
-        var files = new DirectoryInfo(proj.Info.BuildDirectory).GetFiles("*.html");
+        var files = new DirectoryInfo(proj.Info.BuildDirectory).GetFiles("*.md");
         var welcome = files.SingleOrDefault(f => Path
                                                 .GetFileNameWithoutExtension(f.Name)
                                                 .Equals("welcome", StringComparison.OrdinalIgnoreCase));
@@ -184,7 +185,7 @@ public sealed class Linker : IDisposable
                                               .Equals("error", StringComparison.OrdinalIgnoreCase));
         var roots = new DirectoryInfo(proj.Info.BuildDirectory)
                    .GetFileSystemInfos()
-                   .Where(fs => (fs.Attributes & FileAttributes.Directory) != 0 || fs.FullName.EndsWith(".html"))
+                   .Where(fs => (fs.Attributes & FileAttributes.Directory) != 0 || fs.FullName.EndsWith(".md"))
                    .Select(f => new PostTreeNode(f, null))
                    .ToArray();
 
