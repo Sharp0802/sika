@@ -6,11 +6,20 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <InvariantGlobalization>true</InvariantGlobalization>
     </PropertyGroup>
 
     <ItemGroup>
         <TrimmerRootDescriptor Include="Resources/TrimmerRoots.xml" />
+        <TrimmerRootAssembly Include="System.Linq"/>
+        <TrimmerRootAssembly Include="System.Collections"/>
+        <TrimmerRootAssembly Include="System.Runtime"/>
     </ItemGroup>
+    
+    <PropertyGroup>
+        <PublishTrimmed>true</PublishTrimmed>
+        <StripSymbols>true</StripSymbols>
+    </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="../BlogMan.Generator/BlogMan.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
