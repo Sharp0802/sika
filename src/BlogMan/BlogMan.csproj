@@ -10,17 +10,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <TrimmerRootDescriptor Include="Resources/TrimmerRoots.xml" />
+        <TrimmerRootDescriptor Include="Resources/TrimmerRoots.xml"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../BlogMan.Generator/BlogMan.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <PackageReference Include="MarkdigExtensions.UrlRewriter" Version="1.0.0" />
-        <PackageReference Include="System.Runtime" Version="4.3.1" />
-        <PackageReference Include="YamlDotNet" Version="13.1.0" />
-        <PackageReference Include="Markdig" Version="0.31.0" />
-        <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
-        <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+        <ProjectReference Include="../BlogMan.Generator/BlogMan.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+        <PackageReference Include="MarkdigExtensions.UrlRewriter" Version="1.0.0"/>
+        <PackageReference Include="System.Runtime" Version="4.3.1"/>
+        <PackageReference Include="YamlDotNet" Version="13.1.0"/>
+        <PackageReference Include="Markdig" Version="0.31.0"/>
+        <PackageReference Include="RazorEngine.NetCore" Version="3.1.0"/>
+        <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1"/>
     </ItemGroup>
 
     <ItemGroup>

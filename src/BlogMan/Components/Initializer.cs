@@ -73,15 +73,17 @@ public static class Initializer
         var data = ReadProject(project);
         if (data is null)
             return;
-        
+
         if (Preprocessor.Compile(data))
+        {
             Logger.Log(LogLevel.CMPL, "Complete preprocessing project");
+        }
         else
         {
             Logger.Log(LogLevel.FAIL, "Failed to preprocess project");
             return;
         }
-        
+
         if (Linker.Link(data))
             Logger.Log(LogLevel.CMPL, "Complete compiling project");
         else

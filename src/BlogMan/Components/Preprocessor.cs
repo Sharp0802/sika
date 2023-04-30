@@ -59,8 +59,8 @@ public static class Preprocessor
             var dstInfo = new DirectoryInfo(Path.GetDirectoryName(dst)!);
             if (!dstInfo.Exists) dstInfo.Create();
 
-            var        txt       = File.ReadAllText(file);
-            var        md        = Markdown.Parse(txt, Pipeline);
+            var txt = File.ReadAllText(file);
+            var md  = Markdown.Parse(txt, Pipeline);
 
             if (md.Descendants<YamlFrontMatterBlock>().FirstOrDefault() is { } yaml)
             {
@@ -76,7 +76,7 @@ public static class Preprocessor
                 if (Yaml.Deserialize<PostFrontMatter?>(reader) is null)
                     throw new InvalidDataException("Invalid post front matter detected.");
 
-                File.WriteAllText(args.Yaml, yamlText,            Encoding.UTF8);
+                File.WriteAllText(args.Yaml, yamlText, Encoding.UTF8);
 
                 txt = txt.Remove(yaml.Span.Start, yaml.Span.Length);
                 File.WriteAllText(args.Html, txt, Encoding.UTF8);

@@ -24,8 +24,8 @@ public partial class Project : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
         var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(Info), typeof(ProjectInfo)));
-        list.AddRange(this.ValidateProperty(nameof(Profile), typeof(ProfileInfo)));
+        list.AddRange(this.ValidateProperty(nameof(Info),     typeof(ProjectInfo)));
+        list.AddRange(this.ValidateProperty(nameof(Profile),  typeof(ProfileInfo)));
         list.AddRange(this.ValidateProperty(nameof(Contacts), typeof(Contacts)));
         return list;
     }

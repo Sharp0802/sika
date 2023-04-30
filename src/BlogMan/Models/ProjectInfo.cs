@@ -9,12 +9,12 @@ public partial class ProjectInfo : IValidatableObject
 {
     [JsonConstructor]
     public ProjectInfo(
-        string name, 
-        Version apiVersion, 
-        string postDirectory, 
-        string layoutDirectory, 
-        string siteDirectory, 
-        string buildDirectory)
+        string  name,
+        Version apiVersion,
+        string  postDirectory,
+        string  layoutDirectory,
+        string  siteDirectory,
+        string  buildDirectory)
     {
         Name            = name;
         ApiVersion      = apiVersion;
@@ -39,12 +39,12 @@ public partial class ProjectInfo : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
         var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(Name), typeof(string)));
-        list.AddRange(this.ValidateProperty(nameof(ApiVersion), typeof(Version)));
-        list.AddRange(this.ValidateProperty(nameof(PostDirectory), typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(Name),            typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(ApiVersion),      typeof(Version)));
+        list.AddRange(this.ValidateProperty(nameof(PostDirectory),   typeof(string)));
         list.AddRange(this.ValidateProperty(nameof(LayoutDirectory), typeof(string)));
-        list.AddRange(this.ValidateProperty(nameof(SiteDirectory), typeof(string)));
-        list.AddRange(this.ValidateProperty(nameof(BuildDirectory), typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(SiteDirectory),   typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(BuildDirectory),  typeof(string)));
         return list;
     }
 }

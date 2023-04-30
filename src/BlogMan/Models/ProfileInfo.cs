@@ -21,7 +21,7 @@ public partial class ProfileInfo : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
         var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(UserName), typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(UserName),     typeof(string)));
         list.AddRange(this.ValidateProperty(nameof(ProfileImage), typeof(string)));
         return list;
     }

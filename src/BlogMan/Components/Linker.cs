@@ -1,28 +1,20 @@
-using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using BlogMan.Contexts;
+using System.Text;
 using BlogMan.Models;
 using Markdig;
 using RazorEngine.Configuration;
 using RazorEngine.Templating;
-using Encoding = System.Text.Encoding;
 
 namespace BlogMan.Components;
 
 public sealed class Linker : IDisposable
 {
+    private readonly Dictionary<string, string>    _escapedMap;
+    private readonly Dictionary<string, string>    _layoutMap;
     private readonly ThreadLocal<MarkdownPipeline> _pipeline = new();
-
-    private MarkdownPipeline Pipeline => _pipeline.Value!;
-
-    private readonly Dictionary<string, string> _escapedMap;
-    private readonly Dictionary<string, string> _layoutMap;
 
     private readonly Project  _project;
     private readonly PostTree _tree;
-    
-    private static IRazorEngineService RazorService { get; }
 
     static Linker()
     {
@@ -31,7 +23,7 @@ public sealed class Linker : IDisposable
 
         AppDomain.CurrentDomain.ProcessExit += (_, _) => RazorService.Dispose();
     }
-    
+
     private Linker(Project project)
     {
         if (!Directory.Exists(project.Info.SiteDirectory))
@@ -53,7 +45,7 @@ public sealed class Linker : IDisposable
 #pragma warning restore CS8619
 #pragma warning restore CS8714
 
-        var asmLoc = AppContext.BaseDirectory;
+        var asmLoc  = AppContext.BaseDirectory;
         var wwwroot = Path.Combine(asmLoc, "wwwroot/");
         var resroot = Path.Combine(asmLoc, "Resources/");
         if (!_layoutMap.ContainsKey("default"))
@@ -79,6 +71,15 @@ public sealed class Linker : IDisposable
                               return t;
                           })
                          .Build();
+    }
+
+    private MarkdownPipeline Pipeline => _pipeline.Value!;
+
+    private static IRazorEngineService RazorService { get; }
+
+    public void Dispose()
+    {
+        _pipeline.Dispose();
     }
 
     private static void CopyDirectory(string src, string dst, bool recurse)
@@ -214,10 +215,5 @@ public sealed class Linker : IDisposable
         var errorPage   = new PostTreeNode(error,   null);
 
         return new PostTree(welcomePage, errorPage, roots);
-    }
-
-    public void Dispose()
-    {
-        _pipeline.Dispose();
     }
 }

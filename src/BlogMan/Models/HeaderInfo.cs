@@ -24,8 +24,8 @@ public partial class HeaderInfo : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext _)
     {
         var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(Title), typeof(string)));
-        list.AddRange(this.ValidateProperty(nameof(Topics), typeof(string[])));
+        list.AddRange(this.ValidateProperty(nameof(Title),      typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(Topics),     typeof(string[])));
         list.AddRange(this.ValidateProperty(nameof(Timestamps), typeof(DateTime[])));
         return list;
     }
