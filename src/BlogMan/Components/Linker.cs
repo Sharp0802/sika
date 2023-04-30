@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using BlogMan.Contexts;
@@ -128,7 +129,6 @@ public sealed class Linker : IDisposable
 
         var htmlName = node.File.FullName;
         var yamlName = Path.ChangeExtension(htmlName, ".yaml");
-        Console.WriteLine(yamlName);
         if (!File.Exists(yamlName))
         {
             Logger.Log(LogLevel.FAIL, "Failed to retrieve yaml front-matter");
@@ -174,9 +174,7 @@ public sealed class Linker : IDisposable
 
             var fname = Path.GetRelativePath(_project.Info.BuildDirectory, fdir);
             fname = Path.ChangeExtension(fname, ".html");
-            Console.WriteLine(fname);
             fname = Path.GetFullPath(fname, Path.GetFullPath(_project.Info.SiteDirectory));
-            Console.WriteLine(fname);
             File.WriteAllText(fname, html, Encoding.UTF8);
         });
         if (!ior)
