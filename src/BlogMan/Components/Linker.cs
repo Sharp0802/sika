@@ -52,11 +52,7 @@ public sealed class Linker : IDisposable
 #pragma warning restore CS8619
 #pragma warning restore CS8714
 
-        var asmLoc = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location)
-                     ?? throw new ReflectionTypeLoadException(
-                         new[] { typeof(Assembly) },
-                         null,
-                         "Failed to load assembly");
+        var asmLoc = AppContext.BaseDirectory;
         var wwwroot = Path.Combine(asmLoc, "wwwroot/");
         var resroot = Path.Combine(asmLoc, "Resources/");
         if (!_layoutMap.ContainsKey("default"))
