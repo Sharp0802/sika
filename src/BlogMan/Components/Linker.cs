@@ -25,10 +25,7 @@ public sealed class Linker : IDisposable
 
     static Linker()
     {
-        var config = new TemplateServiceConfiguration
-        {
-            ReferenceResolver = new RazorReferenceResolver()
-        };
+        var config = new TemplateServiceConfiguration();
         RazorService = RazorEngineService.Create(config);
 
         AppDomain.CurrentDomain.ProcessExit += (_, _) => RazorService.Dispose();
