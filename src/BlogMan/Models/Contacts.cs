@@ -25,8 +25,8 @@ public partial class Contacts : IValidatableObject
     {
         var list = new List<ValidationResult>();
         list.AddRange(this.ValidateProperty(nameof(GitHub), typeof(string)));
-        list.AddRange(this.ValidateProperty(nameof(Email), typeof(string)));
-        list.AddRange(this.ValidateProperty(nameof(Misc), typeof(LinkReference[])));
+        list.AddRange(this.ValidateProperty(nameof(Email),  typeof(string)));
+        list.AddRange(this.ValidateProperty(nameof(Misc),   typeof(LinkReference[])));
         return list;
     }
 }

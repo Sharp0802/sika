@@ -1,25 +1,28 @@
-using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using BlogMan.Models;
 using Markdig;
-using RazorEngine;
+using RazorEngine.Configuration;
 using RazorEngine.Templating;
-using Encoding = System.Text.Encoding;
 
 namespace BlogMan.Components;
 
 public sealed class Linker : IDisposable
 {
+    private readonly Dictionary<string, string>    _escapedMap;
+    private readonly Dictionary<string, string>    _layoutMap;
     private readonly ThreadLocal<MarkdownPipeline> _pipeline = new();
-
-    private MarkdownPipeline Pipeline => _pipeline.Value!;
-
-    private readonly Dictionary<string, string> _escapedMap;
-    private readonly Dictionary<string, string> _layoutMap;
 
     private readonly Project  _project;
     private readonly PostTree _tree;
 
+    static Linker()
+    {
+        var config = new TemplateServiceConfiguration();
+        RazorService = RazorEngineService.Create(config);
+
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => RazorService.Dispose();
+    }
 
     private Linker(Project project)
     {
@@ -42,11 +45,7 @@ public sealed class Linker : IDisposable
 #pragma warning restore CS8619
 #pragma warning restore CS8714
 
-        var asmLoc = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location)
-                     ?? throw new ReflectionTypeLoadException(
-                         new[] { typeof(Assembly) },
-                         null,
-                         "Failed to load assembly");
+        var asmLoc  = AppContext.BaseDirectory;
         var wwwroot = Path.Combine(asmLoc, "wwwroot/");
         var resroot = Path.Combine(asmLoc, "Resources/");
         if (!_layoutMap.ContainsKey("default"))
@@ -72,6 +71,15 @@ public sealed class Linker : IDisposable
                               return t;
                           })
                          .Build();
+    }
+
+    private MarkdownPipeline Pipeline => _pipeline.Value!;
+
+    private static IRazorEngineService RazorService { get; }
+
+    public void Dispose()
+    {
+        _pipeline.Dispose();
     }
 
     private static void CopyDirectory(string src, string dst, bool recurse)
@@ -122,7 +130,6 @@ public sealed class Linker : IDisposable
 
         var htmlName = node.File.FullName;
         var yamlName = Path.ChangeExtension(htmlName, ".yaml");
-        Console.WriteLine(yamlName);
         if (!File.Exists(yamlName))
         {
             Logger.Log(LogLevel.FAIL, "Failed to retrieve yaml front-matter");
@@ -149,7 +156,7 @@ public sealed class Linker : IDisposable
 
         node.Metadata = metadata;
 
-        html = Engine.Razor.RunCompile(
+        html = RazorService.RunCompile(
             _layoutMap[metadata.Layout],
             Guid.NewGuid().ToString(),
             typeof(TemplateModel),
@@ -168,9 +175,7 @@ public sealed class Linker : IDisposable
 
             var fname = Path.GetRelativePath(_project.Info.BuildDirectory, fdir);
             fname = Path.ChangeExtension(fname, ".html");
-            Console.WriteLine(fname);
             fname = Path.GetFullPath(fname, Path.GetFullPath(_project.Info.SiteDirectory));
-            Console.WriteLine(fname);
             File.WriteAllText(fname, html, Encoding.UTF8);
         });
         if (!ior)
@@ -210,10 +215,5 @@ public sealed class Linker : IDisposable
         var errorPage   = new PostTreeNode(error,   null);
 
         return new PostTree(welcomePage, errorPage, roots);
-    }
-
-    public void Dispose()
-    {
-        _pipeline.Dispose();
     }
 }

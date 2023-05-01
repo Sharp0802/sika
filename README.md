@@ -79,11 +79,11 @@ Layout: default
 ## OPTIONS
 
 - `init`
-  - `--project`: The project name to create (**REQUIRED**)
+    - `--project`: The project name to create (**REQUIRED**)
 
 - `new`
-  - `--project`: The project file to build (**REQUIRED**)
-  - `--name`: The name of new post (**REQUIRED**)
+    - `--project`: The project file to build (**REQUIRED**)
+    - `--name`: The name of new post (**REQUIRED**)
 
 
 - `build`

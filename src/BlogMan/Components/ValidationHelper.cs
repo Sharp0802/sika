@@ -39,7 +39,6 @@ public static class ValidationHelper
 
         var val = info.GetValue(obj);
         foreach (var attr in info.GetCustomAttributes())
-        {
             if (attr is RequiredAttribute required)
             {
                 if (required.DisallowAllDefaultValues && val == GetDefaultValue(propT))
@@ -53,7 +52,6 @@ public static class ValidationHelper
                 if (!required.AllowEmptyStrings && string.IsNullOrEmpty(str))
                     list.Add(new ValidationResult("Member cannot be empty.", new[] { prop }));
             }
-        }
 
         return list;
     }
