@@ -29,6 +29,8 @@ public partial class PostTreeNode : IValidatableObject
         ? File.Name
         : Path.ChangeExtension(File.Name, ".html");
 
+    private string RawName => File.Name;
+
     public IEnumerable<ValidationResult> Validate(ValidationContext ctx)
     {
         var list = new List<ValidationResult>();
@@ -51,12 +53,12 @@ public partial class PostTreeNode : IValidatableObject
 
     public string GetIdentifier()
     {
-        return string.Join('/', GetUpperBranch().Select(node => node.Name));
+        return string.Join('/', GetUpperBranch().Select(node => node.RawName));
     }
 
     public string GetEscapedIdentifier()
     {
-        return string.Join("__", GetUpperBranch().Select(node => node.Name));
+        return string.Join("__", GetUpperBranch().Select(node => node.RawName));
     }
 
     public IEnumerable<PostTreeNode> GetAllFile()
