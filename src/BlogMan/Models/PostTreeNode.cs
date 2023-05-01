@@ -82,7 +82,7 @@ public partial class PostTreeNode : IValidatableObject
             if (Parent is null && Name.Equals("Error.html", StringComparison.OrdinalIgnoreCase))
                 return null;
 
-            var id = HttpUtility.HtmlAttributeEncode(GetEscapedIdentifier());
+            var id = HttpUtility.UrlEncode(GetEscapedIdentifier());
             elem = new XElement("li",
                 new XElement("a",
                     new XAttribute("href", id),

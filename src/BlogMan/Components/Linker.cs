@@ -1,5 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Web;
 using BlogMan.Models;
 using Markdig;
 using RazorEngine.Configuration;
@@ -165,17 +167,19 @@ public sealed class Linker : IDisposable
         ior = SEH.IO((object)null!, _ =>
         {
             var fdir = node.Parent is null
-                ? node.File.Name switch
+                ? node.File.Name.ToLowerInvariant() switch
                 {
-                    "Error.md"   => Path.Combine(Path.GetDirectoryName(node.File.FullName)!, "404.md"),
-                    "Welcome.md" => Path.Combine(Path.GetDirectoryName(node.File.FullName)!, "index.md"),
-                    _            => node.File.FullName
+                    "error.md"   => "404.md",
+                    "welcome.md" => "index.md",
+                    _            => node.GetEscapedIdentifier()
                 }
-                : node.File.FullName;
+                : node.GetEscapedIdentifier();
 
-            var fname = Path.GetRelativePath(_project.Info.BuildDirectory, fdir);
+            var fname = Path.Combine(_project.Info.SiteDirectory, fdir);
             fname = Path.ChangeExtension(fname, ".html");
-            fname = Path.GetFullPath(fname, Path.GetFullPath(_project.Info.SiteDirectory));
+            var info = new FileInfo(fname);
+            if (!info.Directory!.Exists)
+                info.Directory.Create();
             File.WriteAllText(fname, html, Encoding.UTF8);
         });
         if (!ior)
