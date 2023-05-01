@@ -10,22 +10,7 @@ blogman [COMMAND] [OPTION]...
 
 ## INSTALLATION
 
-`blogman` provides auto installing script for **linux**.
-Thus, if you use linux, you can install `blogman` with below commands:
-
-```shell
-git clone https://Sharp0802/blogman
-cd blogman-master/src
-sudo ./install.sh
-```
-
-And, you can uninstall `blogman` with below commands:
-
-```shell
-git clone https://Sharp0802/blogman
-cd blogman-master/src
-sudo ./uninstall.sh
-```
+See [wiki](https://github.com/Sharp0802/blogman/wiki/Getting-Started#installation).
 
 ## DESCRIPTION
 
