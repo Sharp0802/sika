@@ -1,42 +1,61 @@
-using System.ComponentModel.DataAnnotations;
-using System.Web;
+using System.Security.Cryptography;
 using System.Xml.Linq;
 using BlogMan.Components;
+using Encoding = System.Text.Encoding;
 
 namespace BlogMan.Models;
 
-[Serializable]
-public partial class PostTreeNode : IValidatableObject
+public partial class PostTreeNode
 {
+    private PostFrontMatter? _metadata;
+    private string?          _identifier;
+    private string?          _htmlIdentifier;
+
     public PostTreeNode(FileSystemInfo file, PostTreeNode? parent)
     {
-        File   = file;
-        Parent = parent;
-        Children = file is DirectoryInfo d
-            ? d.GetFileSystemInfos().Select(f => new PostTreeNode(f, this)).ToArray()
+        FileRecord = file;
+        Parent     = parent;
+        Children = file is DirectoryInfo dir
+            ? dir.GetFileSystemInfos()
+                 .Where(info => (info.Attributes & FileAttributes.Directory) != 0 ||
+                                info.Extension.ToLowerInvariant().Equals(".html", StringComparison.Ordinal))
+                 .Select(info => new PostTreeNode(info, this))
+                 .ToArray()
             : Array.Empty<PostTreeNode>();
     }
 
-    public FileSystemInfo File { get; }
 
-    [Required] public PostFrontMatter? Metadata { get; set; }
+    public FileSystemInfo FileRecord { get; }
+    public PostTreeNode?  Parent     { get; }
 
-    public PostTreeNode[] Children { get; }
+    public string Identifier => _identifier ??= GetIdentifier();
 
-    public PostTreeNode? Parent { get; }
-
-    private string Name => (File.Attributes & FileAttributes.Directory) != 0
-        ? File.Name
-        : Path.ChangeExtension(File.Name, ".html");
-
-    private string RawName => File.Name;
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext ctx)
+    public string HtmlIdentifier
     {
-        var list = new List<ValidationResult>();
-        list.AddRange(this.ValidateProperty(nameof(Metadata), typeof(PostFrontMatter)));
-        return list;
+        get
+        {
+            if (_htmlIdentifier is not null)
+                return _htmlIdentifier;
+
+            if (Parent is null)
+            {
+                var name = Path.GetFileNameWithoutExtension(FileRecord.Name).ToLowerInvariant();
+                if (name.Equals("welcome", StringComparison.Ordinal))
+                    return _htmlIdentifier = "index.html";
+                if (name.Equals("error", StringComparison.Ordinal))
+                    return _htmlIdentifier = "404.html";
+            }
+            
+            var buf = Encoding.UTF8.GetBytes(GetIdentifier());
+            buf = SHA1.HashData(buf);
+            return _htmlIdentifier = $"{Convert.ToHexString(buf).ToUpperInvariant()}.html";
+        }
     }
+
+    public PostFrontMatter Metadata => _metadata ??= QueryMetadata();
+
+
+    private PostTreeNode[] Children { get; }
 
     private IEnumerable<PostTreeNode> GetUpperBranch()
     {
@@ -51,19 +70,14 @@ public partial class PostTreeNode : IValidatableObject
         return list.Reverse();
     }
 
-    public string GetIdentifier()
+    private string GetIdentifier()
     {
-        return string.Join('/', GetUpperBranch().Select(node => node.RawName));
-    }
-
-    public string GetEscapedIdentifier()
-    {
-        return string.Join("__", GetUpperBranch().Select(node => node.RawName));
+        return string.Join('/', GetUpperBranch().Select(node => node.FileRecord.Name));
     }
 
     public IEnumerable<PostTreeNode> GetAllFile()
     {
-        if (File is FileInfo)
+        if (FileRecord is FileInfo)
             yield return this;
         foreach (var child in Children)
         foreach (var item in child.GetAllFile())
@@ -71,22 +85,40 @@ public partial class PostTreeNode : IValidatableObject
     }
 
 
+    private PostFrontMatter QueryMetadata()
+    {
+        if (FileRecord is not FileInfo file)
+            throw new InvalidOperationException();
+        var metadata = file.Directory
+                            !.EnumerateFiles()
+                           .SingleOrDefault(info => Path.GetFileNameWithoutExtension(info.Name).Equals(
+                                                        Path.GetFileNameWithoutExtension(file.Name),
+                                                        StringComparison.Ordinal) &&
+                                                    info.Extension.ToLowerInvariant()
+                                                        .Equals(".yaml", StringComparison.Ordinal));
+        if (metadata is null)
+            throw new FileNotFoundException();
+
+        using var fs = metadata.OpenRead();
+        using var sr = new StreamReader(fs, Encoding.UTF8);
+
+        return Yaml.Deserialize<PostFrontMatter>(sr);
+    }
+
+
     public XElement? GetHtml()
     {
         XElement elem;
 
-        if ((File.Attributes & FileAttributes.Directory) == 0)
+        if ((FileRecord.Attributes & FileAttributes.Directory) == 0)
         {
-            if (Metadata is null)
-                return null;
-            if (Parent is null && Name.Equals("Error.html", StringComparison.OrdinalIgnoreCase))
+            if (Parent is null && FileRecord.Name.ToLowerInvariant().Equals("error.html", StringComparison.Ordinal))
                 return null;
 
-            var id = HttpUtility.UrlEncode(GetEscapedIdentifier());
             elem = new XElement("li",
                 new XElement("a",
-                    new XAttribute("href", id),
-                    new XText(Metadata?.Title ?? "<null>")
+                    new XAttribute("href", HtmlIdentifier),
+                    new XText(Metadata.Title)
                 )
             );
         }
@@ -99,7 +131,7 @@ public partial class PostTreeNode : IValidatableObject
             elem = new XElement("li",
                 new XElement("span",
                     new XAttribute("class", "caret"),
-                    new XText(Path.GetFileNameWithoutExtension(Name))
+                    new XText(Path.GetFileNameWithoutExtension(FileRecord.Name))
                 ),
                 ul
             );
