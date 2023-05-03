@@ -23,10 +23,10 @@ public partial class PostTreeNode
                  .ToArray()
             : Array.Empty<PostTreeNode>();
     }
-
-
+    
     public FileSystemInfo FileRecord { get; }
-    public PostTreeNode?  Parent     { get; }
+
+    private PostTreeNode? Parent { get; }
 
     public string Identifier => _identifier ??= GetIdentifier();
 
