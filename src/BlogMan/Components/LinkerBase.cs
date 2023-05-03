@@ -86,6 +86,8 @@ public abstract class LinkerBase
         return url.StartsWith(prefix) ? ManglingMap[url[prefix.Length..]] : url;
     }
 
+    protected abstract bool Initialize();
+
     protected abstract bool Link(LinkerEventArgs args);
 
     public bool Run()
@@ -97,9 +99,26 @@ public abstract class LinkerBase
                 info.Delete(true);
             info.Create();
         });
+        
+        
+        Logger.Log(LogLevel.INFO, "start global initializing");
+        if (gFailed)
+        {
+            Logger.Log(LogLevel.FAIL, "failed global initializing");
+            return false;
+        }
+        Logger.Log(LogLevel.CMPL, "complete global initializing");
 
+        Logger.Log(LogLevel.INFO, "start local initializing");
+        if (!Initialize())
+        {
+            Logger.Log(LogLevel.FAIL, "failed local initializing");
+            gFailed = true;
+        }
         if (gFailed)
             return false;
+        Logger.Log(LogLevel.CMPL, "complete local initializing");
+
         
         Parallel.ForEach(Tree.GetAllFile(), node =>
         {

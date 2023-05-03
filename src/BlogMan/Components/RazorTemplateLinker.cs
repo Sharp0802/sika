@@ -31,6 +31,18 @@ public sealed class RazorTemplateLinker : LinkerBase, IDisposable
         });
     }
 
+
+    protected override bool Initialize()
+    {
+        return SEH.IO(Path.Combine(AppContext.BaseDirectory, "wwwroot"), dir =>
+        {
+            var dst = new DirectoryInfo(Project.Info.SiteDirectory);
+            if (dst.Exists)
+                dst.Create();
+            new DirectoryInfo(dir).CopyTo(dst);
+        });
+    }
+
     protected override bool Link(LinkerEventArgs args)
     {
         var errors = args.PostNode.Metadata.Validate().ToArray();

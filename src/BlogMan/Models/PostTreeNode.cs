@@ -18,15 +18,15 @@ public partial class PostTreeNode
         Children = file is DirectoryInfo dir
             ? dir.GetFileSystemInfos()
                  .Where(info => (info.Attributes & FileAttributes.Directory) != 0 ||
-                                info.Extension.ToLowerInvariant().Equals(".html", StringComparison.Ordinal))
+                                info.Extension.ToLowerInvariant().Equals(".md", StringComparison.Ordinal))
                  .Select(info => new PostTreeNode(info, this))
                  .ToArray()
             : Array.Empty<PostTreeNode>();
     }
-
-
+    
     public FileSystemInfo FileRecord { get; }
-    public PostTreeNode?  Parent     { get; }
+
+    private PostTreeNode? Parent { get; }
 
     public string Identifier => _identifier ??= GetIdentifier();
 
@@ -112,7 +112,7 @@ public partial class PostTreeNode
 
         if ((FileRecord.Attributes & FileAttributes.Directory) == 0)
         {
-            if (Parent is null && FileRecord.Name.ToLowerInvariant().Equals("error.html", StringComparison.Ordinal))
+            if (Parent is null && FileRecord.Name.ToLowerInvariant().Equals("error.md", StringComparison.Ordinal))
                 return null;
 
             elem = new XElement("li",
