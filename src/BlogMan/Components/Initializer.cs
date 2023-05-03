@@ -84,7 +84,7 @@ public static class Initializer
             return;
         }
 
-        if (Linker.Link(data))
+        if (new RazorTemplateLinker(data).Run())
             Logger.Log(LogLevel.CMPL, "Complete compiling project");
         else
             Logger.Log(LogLevel.FAIL, "Failed to compile project");
