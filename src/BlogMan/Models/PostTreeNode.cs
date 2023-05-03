@@ -18,7 +18,7 @@ public partial class PostTreeNode
         Children = file is DirectoryInfo dir
             ? dir.GetFileSystemInfos()
                  .Where(info => (info.Attributes & FileAttributes.Directory) != 0 ||
-                                info.Extension.ToLowerInvariant().Equals(".html", StringComparison.Ordinal))
+                                info.Extension.ToLowerInvariant().Equals(".md", StringComparison.Ordinal))
                  .Select(info => new PostTreeNode(info, this))
                  .ToArray()
             : Array.Empty<PostTreeNode>();
