@@ -1,4 +1,6 @@
 'use strict';
-document.querySelectorAll("link[rel=defer]").forEach((defer) => {
-    defer.setAttribute("rel", "stylesheet");
-})
+document
+    .querySelectorAll("link[rel=defer]")
+    .forEach(async (defer) => {
+        await new Promise(() => defer.setAttribute("rel", "stylesheet"));
+    })
