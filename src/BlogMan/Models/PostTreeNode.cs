@@ -112,7 +112,7 @@ public partial class PostTreeNode
 
         if ((FileRecord.Attributes & FileAttributes.Directory) == 0)
         {
-            if (Parent is null && FileRecord.Name.ToLowerInvariant().Equals("error.html", StringComparison.Ordinal))
+            if (Parent is null && FileRecord.Name.ToLowerInvariant().Equals("error.md", StringComparison.Ordinal))
                 return null;
 
             elem = new XElement("li",
