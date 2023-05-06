@@ -74,6 +74,8 @@ public static class Initializer
         if (data is null)
             return;
 
+        Logger.Log(LogLevel.INFO, "Start preprocessing project");
+
         if (Preprocessor.Compile(data))
         {
             Logger.Log(LogLevel.CMPL, "Complete preprocessing project");
@@ -84,10 +86,12 @@ public static class Initializer
             return;
         }
 
+        Logger.Log(LogLevel.INFO, "Start building project");
+
         if (new RazorTemplateLinker(data).Run())
-            Logger.Log(LogLevel.CMPL, "Complete compiling project");
+            Logger.Log(LogLevel.CMPL, "Complete building project");
         else
-            Logger.Log(LogLevel.FAIL, "Failed to compile project");
+            Logger.Log(LogLevel.FAIL, "Failed to build project");
     }
 
     private static void Init(string name)
@@ -121,6 +125,8 @@ public static class Initializer
                         "your-email",
                         Array.Empty<LinkReference>())),
                 SourceGenerationContext.Default.Project);
+
+            Logger.Log(LogLevel.CMPL, $"'{file.Name}' created.");
         });
     }
 
@@ -155,6 +161,8 @@ public static class Initializer
                     Array.Empty<string>()));
 
             writer.Write($"---\n\n# {name}\n");
+
+            Logger.Log(LogLevel.CMPL, $"'{file.Name}' created.");
         });
     }
 

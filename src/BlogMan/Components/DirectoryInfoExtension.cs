@@ -6,7 +6,7 @@ public static class DirectoryInfoExtension
     {
         if (!dst.Exists)
             dst.Create();
-        
+
         foreach (var file in src.EnumerateFiles())
             File.Copy(file.FullName, Path.Combine(dst.FullName, file.Name), true);
 
