@@ -1,15 +1,15 @@
 using System.Security.Cryptography;
+using System.Text;
 using System.Xml.Linq;
 using BlogMan.Components;
-using Encoding = System.Text.Encoding;
 
 namespace BlogMan.Models;
 
 public partial class PostTreeNode
 {
-    private PostFrontMatter? _metadata;
-    private string?          _identifier;
     private string?          _htmlIdentifier;
+    private string?          _identifier;
+    private PostFrontMatter? _metadata;
 
     public PostTreeNode(FileSystemInfo file, PostTreeNode? parent)
     {
@@ -23,7 +23,7 @@ public partial class PostTreeNode
                  .ToArray()
             : Array.Empty<PostTreeNode>();
     }
-    
+
     public FileSystemInfo FileRecord { get; }
 
     private PostTreeNode? Parent { get; }
@@ -45,7 +45,7 @@ public partial class PostTreeNode
                 if (name.Equals("error", StringComparison.Ordinal))
                     return _htmlIdentifier = "404.html";
             }
-            
+
             var buf = Encoding.UTF8.GetBytes(GetIdentifier());
             buf = SHA1.HashData(buf);
             return _htmlIdentifier = $"{Convert.ToHexString(buf).ToUpperInvariant()}.html";

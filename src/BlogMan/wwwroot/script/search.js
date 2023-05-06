@@ -14,8 +14,7 @@ function UpdateQuery() {
     let filter = search.value.toUpperCase().replace(/\s/g, "");
 
     let tree = document.getElementById("tree-view");
-    for (const href of tree.getElementsByTagName("a"))
-    {
+    for (const href of tree.getElementsByTagName("a")) {
         let parent = href.parentElement;
         parent.style.display = href.textContent.toUpperCase().replace(/\s/g, "").indexOf(filter) > -1 ? "" : "none";
     }
@@ -32,10 +31,9 @@ function UpdateQuery() {
         let uls = lst.children;
         if (uls.length === 1)
             continue;
-        
+
         let necessary = false;
-        for (const ul of uls)
-        {
+        for (const ul of uls) {
             if (ul.tagName.toLowerCase() !== "ul")
                 continue;
             if (ul.style.display !== "none") {

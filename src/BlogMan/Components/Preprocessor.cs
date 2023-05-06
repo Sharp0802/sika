@@ -80,6 +80,7 @@ public static class Preprocessor
 
                 txt = txt.Remove(yaml.Span.Start, yaml.Span.Length);
                 File.WriteAllText(args.Html, txt, Encoding.UTF8);
+                Logger.Log(LogLevel.CMPL, $"'{file}' -> '{dstHtml}','{dstYaml}'");
             }
             else
             {

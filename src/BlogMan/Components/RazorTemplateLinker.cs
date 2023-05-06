@@ -20,6 +20,11 @@ public sealed class RazorTemplateLinker : LinkerBase, IDisposable
 
     private IRazorEngineService RazorService { get; }
 
+    public void Dispose()
+    {
+        _pipeline.Dispose();
+    }
+
     private string GetLayout(string key)
     {
         return _layoutMap.GetOrAdd(key, p =>
@@ -65,10 +70,5 @@ public sealed class RazorTemplateLinker : LinkerBase, IDisposable
         sw.Write(html);
 
         return true;
-    }
-
-    public void Dispose()
-    {
-        _pipeline.Dispose();
     }
 }
