@@ -5,22 +5,19 @@
 ![](https://img.shields.io/github/license/Sharp0802/blogman)
 ![](https://img.shields.io/github/v/tag/Sharp0802/blogman)
 ![](https://img.shields.io/github/actions/workflow/status/Sharp0802/blogman/dotnet.yml?branch=master)
+![](https://img.shields.io/github/repo-size/Sharp0802/blogman)
 
 A cross-platform static blog webpage generator, written in C#.
 
-## SYNOPSIS
+## GETTING STARTED
 
-```shell
-blogman [COMMAND] [OPTION]...
-```
+See [wiki](https://github.com/Sharp0802/blogman/wiki/Getting-Started).
 
-## INSTALLATION
+## PREVIEW
 
-See [wiki](https://github.com/Sharp0802/blogman/wiki/Getting-Started#installation).
+![](img/screenshot.png)
 
-## DESCRIPTION
-
-See [wiki](https://github.com/Sharp0802/blogman/wiki).
+- My [blog](https://sharp0802.github.io) generated with `blogman`.
 
 ## SECURITY
 
