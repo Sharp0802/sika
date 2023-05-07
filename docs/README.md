@@ -9,19 +9,15 @@
 
 A cross-platform static blog webpage generator, written in C#.
 
-## SYNOPSIS
+## GETTING STARTED
 
-```shell
-blogman [COMMAND] [OPTION]...
-```
+See [wiki](https://github.com/Sharp0802/blogman/wiki/Getting-Started).
 
-## INSTALLATION
+## PREVIEW
 
-See [wiki](https://github.com/Sharp0802/blogman/wiki/Getting-Started#installation).
+![](img/screenshot.png)
 
-## DESCRIPTION
-
-See [wiki](https://github.com/Sharp0802/blogman/wiki).
+- My [blog](https://sharp0802.github.io) generated with `blogman`.
 
 ## SECURITY
 
