@@ -25,7 +25,7 @@ public class LinkerEventArgs : EventArgs
     public FileInfo     Destination { get; }
 }
 
-public abstract class LinkerBase
+public abstract class LinkerBase : IDisposable
 {
     protected LinkerBase(Project project)
     {
@@ -159,4 +159,6 @@ public abstract class LinkerBase
 
         return !gFailed;
     }
+
+    public abstract void Dispose();
 }
