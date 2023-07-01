@@ -11,6 +11,7 @@ public partial class ProjectInfo : IValidatableObject
     public ProjectInfo(
         string  name,
         Version apiVersion,
+        string  rootUri,
         string  postDirectory,
         string  layoutDirectory,
         string  siteDirectory,
@@ -18,6 +19,7 @@ public partial class ProjectInfo : IValidatableObject
     {
         Name            = name;
         ApiVersion      = apiVersion;
+        RootUri         = rootUri;
         PostDirectory   = postDirectory;
         LayoutDirectory = layoutDirectory;
         SiteDirectory   = siteDirectory;
@@ -27,6 +29,8 @@ public partial class ProjectInfo : IValidatableObject
     [Required] public string Name { get; set; }
 
     [Required] public Version ApiVersion { get; set; }
+
+    [Required] public string RootUri { get; set; }
 
     [Required] public string PostDirectory { get; set; }
 
@@ -41,6 +45,7 @@ public partial class ProjectInfo : IValidatableObject
         var list = new List<ValidationResult>();
         list.AddRange(this.ValidateProperty(nameof(Name),            typeof(string)));
         list.AddRange(this.ValidateProperty(nameof(ApiVersion),      typeof(Version)));
+        list.AddRange(this.ValidateProperty(nameof(RootUri),         typeof(string)));
         list.AddRange(this.ValidateProperty(nameof(PostDirectory),   typeof(string)));
         list.AddRange(this.ValidateProperty(nameof(LayoutDirectory), typeof(string)));
         list.AddRange(this.ValidateProperty(nameof(SiteDirectory),   typeof(string)));

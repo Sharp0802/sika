@@ -39,18 +39,11 @@ public static class ValidationHelper
 
         var val = info.GetValue(obj);
         foreach (var attr in info.GetCustomAttributes())
-            if (attr is RequiredAttribute required)
+            if (attr is ValidationAttribute validation)
             {
-                if (required.DisallowAllDefaultValues && val == GetDefaultValue(propT))
-                {
-                    list.Add(new ValidationResult("Member cannot be default.", new[] { prop }));
+                if (validation.IsValid(val)) 
                     continue;
-                }
-
-                if (val is not string str)
-                    continue;
-                if (!required.AllowEmptyStrings && string.IsNullOrEmpty(str))
-                    list.Add(new ValidationResult("Member cannot be empty.", new[] { prop }));
+                list.Add(new ValidationResult(validation.FormatErrorMessage(prop), new[] { prop }));
             }
 
         return list;

@@ -20,7 +20,7 @@ public sealed class RazorTemplateLinker : LinkerBase, IDisposable
 
     private IRazorEngineService RazorService { get; }
 
-    public void Dispose()
+    public override void Dispose()
     {
         _pipeline.Dispose();
     }

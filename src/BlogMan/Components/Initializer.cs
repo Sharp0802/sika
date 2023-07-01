@@ -18,6 +18,10 @@ public static class Initializer
         {
             IsRequired = true
         };
+        var rootUri = new Option<string>("--root", "Specify the root uri of site to generate")
+        {
+            IsRequired = true
+        };
 
         var build = new Command("build", "Build the specific project");
         build.AddOption(project);
@@ -30,7 +34,8 @@ public static class Initializer
 
         var init = new Command("init", "Create a new project");
         init.AddOption(name);
-        init.SetHandler(Init, name);
+        init.AddOption(rootUri);
+        init.SetHandler(Init, name, rootUri);
 
         var clean = new Command("clean", "Clean the build directories of specific project");
         clean.AddOption(project);
@@ -94,7 +99,7 @@ public static class Initializer
             Logger.Log(LogLevel.FAIL, "Failed to build project");
     }
 
-    private static void Init(string name)
+    private static void Init(string name, string root)
     {
         var file = new FileInfo($"{name}.blog.json");
         SEH.IO(file, _ =>
@@ -113,6 +118,7 @@ public static class Initializer
                     new ProjectInfo(
                         name,
                         Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(0, 0, 0),
+                        root,
                         "post/",
                         "layout/",
                         "site/",
