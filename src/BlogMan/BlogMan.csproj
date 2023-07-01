@@ -1,4 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    
+    <PropertyGroup>
+        <RuntimeIdentifiers>win-x86;win-x64;linux-x86;linux-x64</RuntimeIdentifiers>
+    </PropertyGroup>
 
     <PropertyGroup>
         <AssemblyName>blogman</AssemblyName>
@@ -27,5 +31,9 @@
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
+    
+    <PropertyGroup Condition="$(RuntimeIdentifier.StartsWith('win'))">
+        <SelfContained>true</SelfContained>
+    </PropertyGroup>
 
 </Project>
