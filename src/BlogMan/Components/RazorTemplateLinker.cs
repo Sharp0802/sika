@@ -50,7 +50,7 @@ public sealed class RazorTemplateLinker : LinkerBase, IDisposable
 
     protected override bool Link(LinkerEventArgs args)
     {
-        var metadata = args.PostNode.FrontMatter;
+        var metadata = args.PostNode.Metadata;
         if (metadata is null)
         {
             Logger.Log(LogLevel.FAIL, "Metadata not found.");
