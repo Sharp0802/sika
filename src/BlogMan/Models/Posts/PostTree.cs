@@ -8,7 +8,7 @@ namespace BlogMan.Models.Posts;
 
 public abstract class PostTree : ITree<PostTree>
 {
-    protected PostTree[]? Children { get; set; }
+    protected PostTree[]? Children { get; private set; }
     protected FileSystemInfo? Parent { get; }
     protected FileSystemInfo Current { get; }
 

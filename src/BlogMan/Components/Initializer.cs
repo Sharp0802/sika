@@ -97,6 +97,11 @@ public static class Initializer
             Logger.Log(LogLevel.CMPL, "Complete building project");
         else
             Logger.Log(LogLevel.FAIL, "Failed to build project");
+        
+        if (new GoogleSitemapLinker(data).Run())
+            Logger.Log(LogLevel.CMPL, "Complete building sitemap");
+        else
+            Logger.Log(LogLevel.FAIL, "Failed to build sitemap");
     }
 
     private static void Init(string name, string root)

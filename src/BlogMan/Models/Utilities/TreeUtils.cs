@@ -6,7 +6,7 @@ namespace BlogMan.Models.Utilities;
 public enum TraversalOrder
 {
     Preorder,
-    Postorder,
+    Postorder
 }
 
 public static class TreeUtils

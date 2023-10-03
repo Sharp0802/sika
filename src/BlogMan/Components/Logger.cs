@@ -2,7 +2,6 @@ namespace BlogMan.Components;
 
 public enum LogLevel
 {
-    CRIT,
     FAIL,
     WARN,
     INFO,
@@ -47,19 +46,6 @@ public static class Logger
     public static void Log(LogLevel lv, string msg, string target)
     {
         Log(lv, $"{target}: {msg}");
-    }
-
-    public static void Log(LogLevel lv, Exception ex)
-    {
-        lock (LockHandle)
-        {
-            var pre = Console.ForegroundColor;
-            Console.ForegroundColor = Colors[(int)lv];
-            Console.Write(Headers[(int)lv]);
-            Console.ForegroundColor = pre;
-            Console.WriteLine(": === EXCEPTION ===");
-            Console.WriteLine(ex.ToString());
-        }
     }
 
     public static void Log(LogLevel lv, Exception ex, string target)

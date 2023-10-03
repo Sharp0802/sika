@@ -4,12 +4,10 @@ namespace BlogMan.Models.Posts;
 
 public class PostBranch : PostTree
 {
-    public new DirectoryInfo Parent { get; }
-    public new DirectoryInfo Current { get; }
+    private new DirectoryInfo Current { get; }
 
     public PostBranch(FileSystemInfo parent, FileSystemInfo current) : base(parent, current)
     {
-        Parent = (DirectoryInfo)parent;
         Current = (DirectoryInfo)current;
     }
 

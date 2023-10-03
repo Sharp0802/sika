@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Xml.Linq;
 using BlogMan.Components;
 using BlogMan.Models.Utilities;
 
@@ -11,6 +12,7 @@ public enum PostKind
     Error
 }
 
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
 public class PostLeaf : PostTree
 {
     public DirectoryInfo    Directory { get; }
@@ -49,7 +51,10 @@ public class PostLeaf : PostTree
 
         var file = q.FirstOrDefault();
         if (file is null)
+        {
+            Logger.Log(LogLevel.WARN, "yaml metadata not found; linkage will be failed", Info.FullName);
             return null;
+        }
 
         using var stream = file.OpenText();
         return Yaml.Deserialize<PostFrontMatter>(stream);

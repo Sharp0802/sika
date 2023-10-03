@@ -1,3 +1,4 @@
+using System.Text;
 using BlogMan.Models;
 using BlogMan.Models.IO;
 using BlogMan.Models.Posts;
@@ -93,6 +94,23 @@ public abstract class LinkerBase : IDisposable
 
     public bool Run()
     {
+        var conflicts = Tree.Validate().ToArray();
+        if (conflicts.Any())
+        {
+            Logger.Log(LogLevel.FAIL, "conflicts detected between posts");
+            foreach (var conflict in conflicts)
+            {
+                var lst = from fsi in conflict.Conflicts select $"\n-{fsi.Info.FullName}";
+                Logger.Log(
+                    LogLevel.FAIL, 
+                    $"{conflict.Message}:{lst.Aggregate(new StringBuilder(), (b, c) => b.Append(c))}");
+            }
+
+            return false;
+        }
+
+        Logger.Log(LogLevel.INFO, "start global initializing");
+        
         var gFailed = !SEH.IO(Project.Info.SiteDirectory, dir =>
         {
             var info = new DirectoryInfo(dir);
@@ -100,9 +118,6 @@ public abstract class LinkerBase : IDisposable
                 info.Delete(true);
             info.Create();
         });
-
-
-        Logger.Log(LogLevel.INFO, "start global initializing");
         if (gFailed)
         {
             Logger.Log(LogLevel.FAIL, "failed global initializing");

@@ -15,13 +15,6 @@ public static class ValidationHelper
         return obj.Validate(null!);
     }
 
-    private static object? GetDefaultValue(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-        Type t)
-    {
-        return t.IsValueType ? Activator.CreateInstance(t) : null;
-    }
-
     public static IEnumerable<ValidationResult> ValidateProperty<
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
         T>(
