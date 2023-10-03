@@ -25,10 +25,15 @@ public sealed class GoogleSitemapLinker : LinkerBase
 
     protected override bool Link(LinkerEventArgs args)
     {
-        var uri = new Uri(
-            new Uri(Project.Info.RootUri), 
-            Path.GetRelativePath(Project.Info.SiteDirectory, args.Destination.FullName));
-        var mod = args.PostNode.Metadata.Timestamps.Max();
+        var href = args.PostNode.GetHRef();
+        if (href.StartsWith('/'))
+            href = href[1..];
+        
+        var uri = new Uri(new Uri(Project.Info.RootUri), href);
+        
+        var mod = args.PostNode.Metadata?.Timestamps.Max();
+        if (mod is null)
+            return false;
         
         lock (_sync)
         {
