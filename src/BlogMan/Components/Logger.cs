@@ -14,7 +14,6 @@ public static class Logger
 
     private static readonly ConsoleColor[] Colors =
     {
-        ConsoleColor.Red,
         ConsoleColor.DarkRed,
         ConsoleColor.Yellow,
         ConsoleColor.Gray,
@@ -23,7 +22,6 @@ public static class Logger
 
     private static readonly string[] Headers =
     {
-        "crit",
         "fail",
         "warn",
         "info",
