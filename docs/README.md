@@ -11,6 +11,14 @@
 
 SIKA (formerly called as blogman) is a cross-platform static blog/note webpage generator, written in C#.
 
+## FEATURES
+
+- Implemented with pure C#
+- GitHub flavoured Markdown support
+- Custom layout support with Razor/C#
+- Google xml sitemap support
+- Highly configurable
+
 ## GETTING STARTED
 
 See [wiki](https://github.com/Sharp0802/blogman/wiki/Getting-Started).

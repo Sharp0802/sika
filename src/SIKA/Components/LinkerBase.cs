@@ -11,27 +11,18 @@ using SIKA.Models.Utilities;
 
 namespace SIKA.Components;
 
-public class LinkerEventArgs : EventArgs
+public class LinkerEventArgs(Project project,
+        PostRoot                     tree,
+        PostLeaf                     node,
+        string                       content,
+        FileInfo                     dest)
+    : EventArgs
 {
-    public LinkerEventArgs(
-        Project  project,
-        PostRoot tree,
-        PostLeaf node,
-        string   content,
-        FileInfo dest)
-    {
-        Project     = project;
-        PostTree    = tree;
-        PostNode    = node;
-        Content     = content;
-        Destination = dest;
-    }
-
-    public Project  Project     { get; }
-    public PostRoot PostTree    { get; }
-    public PostLeaf PostNode    { get; }
-    public string   Content     { get; }
-    public FileInfo Destination { get; }
+    public Project  Project     { get; } = project;
+    public PostRoot PostTree    { get; } = tree;
+    public PostLeaf PostNode    { get; } = node;
+    public string   Content     { get; } = content;
+    public FileInfo Destination { get; } = dest;
 }
 
 public abstract class LinkerBase : IDisposable

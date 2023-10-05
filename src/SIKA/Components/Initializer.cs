@@ -60,7 +60,7 @@ public static class Initializer
                     return null;
                 }
 
-                var errors = data.Validate<Project>().ToArray();
+                var errors = data.Validate().ToArray();
                 if (errors.Length != 0)
                 {
                     errors.PrintErrors(project.FullName);

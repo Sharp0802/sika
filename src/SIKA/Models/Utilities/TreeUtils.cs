@@ -40,7 +40,7 @@ public static class TreeUtils
     public delegate TTo BurnDelegate<in TFrom, out TTo>(TFrom? parent, TFrom current);
 
     [Pure]
-    public static TTo Burn<TFrom, TTo, TValue>(
+    private static TTo Burn<TFrom, TTo, TValue>(
         this TFrom                       current,
         TFrom                            parent,
         [Pure] Func<TFrom, TValue>       selector,
