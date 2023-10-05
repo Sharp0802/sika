@@ -2,7 +2,7 @@
 
 PP=$PWD
 CP=$(dirname "$(readlink -f "$0")")
-cd "${CP}/BlogMan" || exit 1
+cd "${CP}/SIKA" || exit 1
 
 dotnet publish -r linux-x64      --self-contained -o publish-linux-x64
 dotnet publish -r linux-musl-x64 --self-contained -o publish-linux-musl-x64
