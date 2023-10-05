@@ -7,14 +7,14 @@ fi
 
 PP=$PWD
 CP=$(dirname "$(readlink -f "$0")")
-cd "${CP}/BlogMan" || exit 1
+cd "${CP}/SIKA" || exit 1
 
 dotnet publish -c Release -o ../publish
 
-rm -rf /opt/blogman
-mkdir /opt/blogman
-mv ../publish/* /opt/blogman
+rm -rf /opt/sika
+mkdir /opt/sika
+mv ../publish/* /opt/sika
 
-ln -sf /opt/blogman/blogman /usr/local/bin/blogman
+ln -sf /opt/sika/sika /usr/local/bin/sika
 
 cd "${PP}"
