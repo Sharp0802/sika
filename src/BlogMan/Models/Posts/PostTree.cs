@@ -25,10 +25,13 @@ public abstract class PostTree : ITree<PostTree>
             static fst => fst.Info,
             (p, cur) =>
             {
-                if (cur == fsiRoot)
-                    return new PostRoot(null, cur) as PostTree;
                 if (p is null)
+                {
+                    if (cur == fsiRoot) 
+                        return new PostRoot(null, cur) as PostTree;
                     throw new NullReferenceException("Parent node cannot be null");
+                }
+
                 if ((cur.Attributes & FileAttributes.Directory) != 0)
                     return new PostBranch(p, cur);
                 return new PostLeaf(p, cur);

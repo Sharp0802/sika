@@ -62,7 +62,10 @@ public class PostLeaf : PostTree
 
     public string GetIdentifier()
     {
-        return UriUtils.Normalize(Current.Name);
+        if (Current.Name.Equals("index.md",   StringComparison.OrdinalIgnoreCase) ||
+            Current.Name.Equals("welcome.md", StringComparison.OrdinalIgnoreCase))
+            return "index.html";
+        return UriUtils.Normalize(Path.ChangeExtension(Current.Name, "html"));
     }
 
     public string GetHRef()

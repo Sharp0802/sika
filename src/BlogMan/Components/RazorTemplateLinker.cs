@@ -20,7 +20,7 @@ public sealed class RazorTemplateLinker : LinkerBase, IDisposable
 
     private IRazorEngineService RazorService { get; }
 
-    public override void Dispose()
+    protected override void CleanUp()
     {
         _pipeline.Dispose();
     }
@@ -71,11 +71,10 @@ public sealed class RazorTemplateLinker : LinkerBase, IDisposable
             typeof(TemplateModel),
             new TemplateModel(args.Project, metadata, args.PostTree, args.Content));
 
-        using var fs = args.Destination.Open(FileMode.Create, FileAccess.Write);
-        using var sw = new StreamWriter(fs, Encoding.UTF8);
-
+        using var fd = args.Destination.Open(FileMode.Create);
+        using var sw = new StreamWriter(fd, Encoding.UTF8);
         sw.Write(html);
-
+        
         return true;
     }
 }

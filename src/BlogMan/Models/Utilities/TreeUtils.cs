@@ -38,17 +38,32 @@ public static class TreeUtils
     }
 
     public delegate TTo BurnDelegate<in TFrom, out TTo>(TFrom? parent, TFrom current);
-    
+
     [Pure]
     public static TTo Burn<TFrom, TTo, TValue>(
-        this TFrom from,
-        [Pure] Func<TFrom, TValue> selector,
+        this TFrom                       current,
+        TFrom                            parent,
+        [Pure] Func<TFrom, TValue>       selector,
         [Pure] BurnDelegate<TValue, TTo> burner)
         where TFrom : IReadOnlyTree<TFrom>
         where TTo : ITree<TTo>
     {
-        var root = burner(default, selector(from));
-        var children = from.Select(child => child.Burn(selector, burner));
+        var root     = burner(selector(parent), selector(current));
+        var children = current.Select(child => child.Burn(current, selector, burner));
+        root.Set(children);
+        return root;
+    }
+
+    [Pure]
+    public static TTo Burn<TFrom, TTo, TValue>(
+        this   TFrom                     from,
+        [Pure] Func<TFrom, TValue>       selector,
+        [Pure] BurnDelegate<TValue, TTo> burner)
+        where TFrom : IReadOnlyTree<TFrom>
+        where TTo : ITree<TTo>
+    {
+        var root     = burner(default, selector(from));
+        var children = from.Select(child => child.Burn(from, selector, burner));
         root.Set(children);
         return root;
     }

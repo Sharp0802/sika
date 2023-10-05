@@ -13,7 +13,12 @@ namespace BlogMan.Components;
 
 public class LinkerEventArgs : EventArgs
 {
-    public LinkerEventArgs(Project project, PostRoot tree, PostLeaf node, string content, FileInfo dest)
+    public LinkerEventArgs(
+        Project  project,
+        PostRoot tree,
+        PostLeaf node,
+        string   content,
+        FileInfo dest)
     {
         Project     = project;
         PostTree    = tree;
@@ -92,6 +97,8 @@ public abstract class LinkerBase : IDisposable
 
     protected abstract bool Link(LinkerEventArgs args);
 
+    protected abstract void CleanUp();
+
     public bool Run()
     {
         var conflicts = Tree.Validate().ToArray();
@@ -102,38 +109,23 @@ public abstract class LinkerBase : IDisposable
             {
                 var lst = from fsi in conflict.Conflicts select $"\n-{fsi.Info.FullName}";
                 Logger.Log(
-                    LogLevel.FAIL, 
+                    LogLevel.FAIL,
                     $"{conflict.Message}:{lst.Aggregate(new StringBuilder(), (b, c) => b.Append(c))}");
             }
 
             return false;
         }
 
-        Logger.Log(LogLevel.INFO, "start global initializing");
-        
-        var gFailed = !SEH.IO(Project.Info.SiteDirectory, dir =>
-        {
-            var info = new DirectoryInfo(dir);
-            if (info.Exists)
-                info.Delete(true);
-            info.Create();
-        });
-        if (gFailed)
-        {
-            Logger.Log(LogLevel.FAIL, "failed global initializing");
-            return false;
-        }
-
-        Logger.Log(LogLevel.CMPL, "complete global initializing");
+        var failed = false;
 
         Logger.Log(LogLevel.INFO, "start local initializing");
         if (!Initialize())
         {
             Logger.Log(LogLevel.FAIL, "failed local initializing");
-            gFailed = true;
+            failed = true;
         }
 
-        if (gFailed)
+        if (failed)
             return false;
         Logger.Log(LogLevel.CMPL, "complete local initializing");
 
@@ -142,22 +134,18 @@ public abstract class LinkerBase : IDisposable
         {
             var id   = node.GetIdentifier();
             var href = node.GetHRef();
+            if (href.StartsWith('/'))
+                href = href[1..];
 
             Logger.Log(LogLevel.INFO, $"start building: '{id}'");
 
             var succeeded = SEH.IO(id, _ =>
             {
                 // initialize event-args
-                var args = new LinkerEventArgs(
-                    Project,
-                    Tree,
-                    node,
-                    Markdown.ToHtml(File.ReadAllText(node.Info.FullName), Pipeline),
-                    new FileInfo(Path.Combine(Project.Info.SiteDirectory, href)));
+                var fd = new FileInfo(Path.Combine(Project.Info.SiteDirectory, href));
+                var md = Markdown.ToHtml(File.ReadAllText(node.Info.FullName), Pipeline);
 
-                // ensure file
-                if (!args.Destination.Exists)
-                    args.Destination.Create();
+                var args = new LinkerEventArgs(Project, Tree, node, md, fd);
 
                 // run link event
                 if (!Link(args))
@@ -168,7 +156,7 @@ public abstract class LinkerBase : IDisposable
             if (!succeeded)
             {
                 Logger.Log(LogLevel.FAIL, $"'{id}' -> <failed>");
-                gFailed = true;
+                failed = true;
             }
             else
             {
@@ -176,8 +164,12 @@ public abstract class LinkerBase : IDisposable
             }
         });
 
-        return !gFailed;
+        return !failed;
     }
 
-    public abstract void Dispose();
+    public void Dispose()
+    {
+        CleanUp();
+        GC.SuppressFinalize(this);
+    }
 }
