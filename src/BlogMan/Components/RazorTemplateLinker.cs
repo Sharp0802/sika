@@ -7,7 +7,7 @@ using RazorEngine.Templating;
 
 namespace BlogMan.Components;
 
-public sealed class RazorTemplateLinker : LinkerBase, IDisposable
+public sealed class RazorTemplateLinker : LinkerBase
 {
     private readonly ConcurrentDictionary<string, string> _layoutMap = new();
     private readonly ThreadLocal<MarkdownPipeline>        _pipeline  = new();
