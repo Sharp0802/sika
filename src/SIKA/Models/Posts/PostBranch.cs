@@ -17,14 +17,9 @@ using System.Xml.Linq;
 
 namespace SIKA.Models.Posts;
 
-public class PostBranch : PostTree
+public class PostBranch(FileSystemInfo parent, FileSystemInfo current) : PostTree(parent, current)
 {
-    public new DirectoryInfo Current { get; }
-
-    public PostBranch(FileSystemInfo parent, FileSystemInfo current) : base(parent, current)
-    {
-        Current = (DirectoryInfo)current;
-    }
+    public new DirectoryInfo Current { get; } = (DirectoryInfo)current;
 
     public override XElement? GetHtml()
     {

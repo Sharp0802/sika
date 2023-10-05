@@ -18,17 +18,11 @@ using SIKA.Models.Abstraction;
 
 namespace SIKA.Models.IO;
 
-public class FileSystemTree : IReadOnlyTree<FileSystemTree>
+public class FileSystemTree(FileSystemInfo fsi, Predicate<FileInfo> query) : IReadOnlyTree<FileSystemTree>
 {
-    public FileSystemTree(FileSystemInfo fsi, Predicate<FileInfo> query)
-    {
-        Info = fsi;
-        Query = query;
-    }
+    public FileSystemInfo Info { get; } = fsi;
 
-    public FileSystemInfo Info { get; }
-    
-    private Predicate<FileInfo> Query { get; }
+    private Predicate<FileInfo> Query { get; } = query;
 
     private IEnumerable<FileSystemTree> GetChildren()
     {

@@ -20,16 +20,12 @@ using SIKA.Models;
 
 namespace SIKA.Components;
 
-public sealed class GoogleSitemapLinker : LinkerBase
+public sealed class GoogleSitemapLinker(Project project) : LinkerBase(project)
 {
     private static XNamespace Xmlns => "http://www.sitemaps.org/schemas/sitemap/0.9";
 
     private readonly object    _sync = new();
     private          XElement? _root;
-
-    public GoogleSitemapLinker(Project project) : base(project)
-    {
-    }
 
     protected override bool Initialize()
     {

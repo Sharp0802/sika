@@ -29,12 +29,8 @@ public class PostRootImpl : PostTree
 }
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
-public class PostRoot : PostRootImpl
+public class PostRoot(FileSystemInfo? parent, FileSystemInfo current) : PostRootImpl(parent, current)
 {
-    public PostRoot(FileSystemInfo? parent, FileSystemInfo current) : base(parent, current)
-    {
-    }
-
     public new string GetHtml()
     {
         return Children
