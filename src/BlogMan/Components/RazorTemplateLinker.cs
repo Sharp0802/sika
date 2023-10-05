@@ -20,7 +20,7 @@ public sealed class RazorTemplateLinker : LinkerBase, IDisposable
 
     private IRazorEngineService RazorService { get; }
 
-    public override void Dispose()
+    protected override void CleanUp()
     {
         _pipeline.Dispose();
     }
@@ -50,25 +50,31 @@ public sealed class RazorTemplateLinker : LinkerBase, IDisposable
 
     protected override bool Link(LinkerEventArgs args)
     {
-        var errors = args.PostNode.Metadata.Validate().ToArray();
+        var metadata = args.PostNode.Metadata;
+        if (metadata is null)
+        {
+            Logger.Log(LogLevel.FAIL, "Metadata not found.");
+            return false;
+        }
+        
+        var errors = metadata.Validate().ToArray();
         if (errors.Length != 0)
         {
             Logger.Log(LogLevel.FAIL, "Invalid metadata detected.");
-            errors.PrintErrors(args.PostNode.Identifier);
+            errors.PrintErrors(args.PostNode.GetIdentifier());
             return false;
         }
 
         var html = RazorService.RunCompile(
-            GetLayout(args.PostNode.Metadata.Layout),
+            GetLayout(metadata.Layout),
             Guid.NewGuid().ToString(),
             typeof(TemplateModel),
-            new TemplateModel(args.Project, args.PostNode.Metadata, args.PostTree, args.Content));
+            new TemplateModel(args.Project, metadata, args.PostTree, args.Content));
 
-        using var fs = args.Destination.Open(FileMode.Create, FileAccess.Write);
-        using var sw = new StreamWriter(fs, Encoding.UTF8);
-
+        using var fd = args.Destination.Open(FileMode.Create);
+        using var sw = new StreamWriter(fd, Encoding.UTF8);
         sw.Write(html);
-
+        
         return true;
     }
 }

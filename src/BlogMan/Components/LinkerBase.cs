@@ -1,4 +1,8 @@
+using System.Text;
 using BlogMan.Models;
+using BlogMan.Models.IO;
+using BlogMan.Models.Posts;
+using BlogMan.Models.Utilities;
 using Markdig;
 using Markdig.Extensions.AutoIdentifiers;
 using Markdig.Extensions.AutoLinks;
@@ -9,7 +13,12 @@ namespace BlogMan.Components;
 
 public class LinkerEventArgs : EventArgs
 {
-    public LinkerEventArgs(Project project, PostTree tree, PostTreeNode node, string content, FileInfo dest)
+    public LinkerEventArgs(
+        Project  project,
+        PostRoot tree,
+        PostLeaf node,
+        string   content,
+        FileInfo dest)
     {
         Project     = project;
         PostTree    = tree;
@@ -18,11 +27,11 @@ public class LinkerEventArgs : EventArgs
         Destination = dest;
     }
 
-    public Project      Project     { get; }
-    public PostTree     PostTree    { get; }
-    public PostTreeNode PostNode    { get; }
-    public string       Content     { get; }
-    public FileInfo     Destination { get; }
+    public Project  Project     { get; }
+    public PostRoot PostTree    { get; }
+    public PostLeaf PostNode    { get; }
+    public string   Content     { get; }
+    public FileInfo Destination { get; }
 }
 
 public abstract class LinkerBase : IDisposable
@@ -31,18 +40,16 @@ public abstract class LinkerBase : IDisposable
     {
         Project = project;
 
-        var nodes = new DirectoryInfo(project.Info.BuildDirectory)
-                   .EnumerateFileSystemInfos()
-                   .Where(info => (info.Attributes & FileAttributes.Directory) != 0 ||
-                                  info.Extension.ToLowerInvariant().Equals(".md", StringComparison.Ordinal))
-                   .Select(info => new PostTreeNode(info, null))
-                   .ToArray();
+        var fst = new FileSystemTree(
+            new DirectoryInfo(project.Info.BuildDirectory),
+            fi => fi.Extension.Equals(".md", StringComparison.OrdinalIgnoreCase)
+        );
+        Tree = PostTree.Burn(fst);
 
-        Tree = new PostTree(nodes);
-
-        ManglingMap = nodes.ToDictionary(
-            node => Path.GetRelativePath(project.Info.BuildDirectory, node.FileRecord.FullName),
-            node => node.HtmlIdentifier);
+        ManglingMap = ((PostTree)Tree).Traverse().OfType<PostLeaf>().ToDictionary(
+            leaf => Path.GetRelativePath(project.Info.BuildDirectory, leaf.Info.FullName),
+            leaf => leaf.GetHRef()
+        );
 
         Pipeline = new MarkdownPipelineBuilder()
                   .UseBootstrap()
@@ -75,7 +82,7 @@ public abstract class LinkerBase : IDisposable
 
     protected Project Project { get; }
 
-    private PostTree                   Tree        { get; }
+    private PostRoot                   Tree        { get; }
     private Dictionary<string, string> ManglingMap { get; }
     private MarkdownPipeline           Pipeline    { get; }
 
@@ -90,55 +97,55 @@ public abstract class LinkerBase : IDisposable
 
     protected abstract bool Link(LinkerEventArgs args);
 
+    protected abstract void CleanUp();
+
     public bool Run()
     {
-        var gFailed = !SEH.IO(Project.Info.SiteDirectory, dir =>
+        var conflicts = Tree.Validate().ToArray();
+        if (conflicts.Any())
         {
-            var info = new DirectoryInfo(dir);
-            if (info.Exists)
-                info.Delete(true);
-            info.Create();
-        });
+            Logger.Log(LogLevel.FAIL, "conflicts detected between posts");
+            foreach (var conflict in conflicts)
+            {
+                var lst = from fsi in conflict.Conflicts select $"\n-{fsi.Info.FullName}";
+                Logger.Log(
+                    LogLevel.FAIL,
+                    $"{conflict.Message}:{lst.Aggregate(new StringBuilder(), (b, c) => b.Append(c))}");
+            }
 
-
-        Logger.Log(LogLevel.INFO, "start global initializing");
-        if (gFailed)
-        {
-            Logger.Log(LogLevel.FAIL, "failed global initializing");
             return false;
         }
 
-        Logger.Log(LogLevel.CMPL, "complete global initializing");
+        var failed = false;
 
         Logger.Log(LogLevel.INFO, "start local initializing");
         if (!Initialize())
         {
             Logger.Log(LogLevel.FAIL, "failed local initializing");
-            gFailed = true;
+            failed = true;
         }
 
-        if (gFailed)
+        if (failed)
             return false;
         Logger.Log(LogLevel.CMPL, "complete local initializing");
 
 
-        Parallel.ForEach(Tree.GetAllFile(), node =>
+        Parallel.ForEach(((PostTree)Tree).Traverse().OfType<PostLeaf>(), node =>
         {
-            Logger.Log(LogLevel.INFO, $"start building: '{node.Identifier}'");
+            var id   = node.GetIdentifier();
+            var href = node.GetHRef();
+            if (href.StartsWith('/'))
+                href = href[1..];
 
-            var succeeded = SEH.IO(node.Identifier, _ =>
+            Logger.Log(LogLevel.INFO, $"start building: '{id}'");
+
+            var succeeded = SEH.IO(id, _ =>
             {
                 // initialize event-args
-                var args = new LinkerEventArgs(
-                    Project,
-                    Tree,
-                    node,
-                    Markdown.ToHtml(File.ReadAllText(node.FileRecord.FullName), Pipeline),
-                    new FileInfo(Path.Combine(Project.Info.SiteDirectory, node.HtmlIdentifier)));
+                var fd = new FileInfo(Path.Combine(Project.Info.SiteDirectory, href));
+                var md = Markdown.ToHtml(File.ReadAllText(node.Info.FullName), Pipeline);
 
-                // ensure file
-                if (!args.Destination.Exists)
-                    args.Destination.Create();
+                var args = new LinkerEventArgs(Project, Tree, node, md, fd);
 
                 // run link event
                 if (!Link(args))
@@ -148,17 +155,21 @@ public abstract class LinkerBase : IDisposable
             // log result
             if (!succeeded)
             {
-                Logger.Log(LogLevel.FAIL, $"'{node.Identifier}' -> <failed>");
-                gFailed = true;
+                Logger.Log(LogLevel.FAIL, $"'{id}' -> <failed>");
+                failed = true;
             }
             else
             {
-                Logger.Log(LogLevel.CMPL, $"'{node.Identifier}' -> '{node.HtmlIdentifier}'");
+                Logger.Log(LogLevel.CMPL, $"'{id}' -> '{href}'");
             }
         });
 
-        return !gFailed;
+        return !failed;
     }
 
-    public abstract void Dispose();
+    public void Dispose()
+    {
+        CleanUp();
+        GC.SuppressFinalize(this);
+    }
 }

@@ -49,28 +49,34 @@ public static class Initializer
 
     private static Project? ReadProject(FileInfo project)
     {
-        return SEH.IO(project, static project =>
-        {
-            using var file = File.OpenRead(project.FullName);
-
-            var data = JsonSerializer.Deserialize(file, SourceGenerationContext.Default.Project);
-            if (data is null)
+        if (!SEH.IO(project, static project =>
             {
-                Logger.Log(LogLevel.FAIL, "Cannot deserialize project file", project.FullName);
-                return null;
-            }
+                using var file = File.OpenRead(project.FullName);
 
-            var errors = data.Validate().ToArray();
-            if (errors.Length != 0)
-            {
-                errors.PrintErrors(project.FullName);
-                return null;
-            }
+                var data = JsonSerializer.Deserialize(file, SourceGenerationContext.Default.Project);
+                if (data is null)
+                {
+                    Logger.Log(LogLevel.FAIL, "Cannot deserialize project file", project.FullName);
+                    return null;
+                }
 
-            return data;
-        }, out var data)
-            ? data
-            : null;
+                var errors = data.Validate().ToArray();
+                if (errors.Length != 0)
+                {
+                    errors.PrintErrors(project.FullName);
+                    return null;
+                }
+
+                return data;
+            }, out var proj))
+            return null;
+
+        proj.Info.BuildDirectory  = Path.Combine(project.DirectoryName!, proj.Info.BuildDirectory);
+        proj.Info.LayoutDirectory = Path.Combine(project.DirectoryName!, proj.Info.LayoutDirectory);
+        proj.Info.PostDirectory   = Path.Combine(project.DirectoryName!, proj.Info.PostDirectory);
+        proj.Info.SiteDirectory   = Path.Combine(project.DirectoryName!, proj.Info.SiteDirectory);
+
+        return proj;
     }
 
     private static void Build(FileInfo project)
@@ -93,10 +99,44 @@ public static class Initializer
 
         Logger.Log(LogLevel.INFO, "Start building project");
 
-        if (new RazorTemplateLinker(data).Run())
-            Logger.Log(LogLevel.CMPL, "Complete building project");
-        else
-            Logger.Log(LogLevel.FAIL, "Failed to build project");
+
+        Logger.Log(LogLevel.INFO, "start global initializing");
+
+        if (!SEH.IO(data.Info.SiteDirectory, dir =>
+            {
+                var info = new DirectoryInfo(dir);
+                if (info.Exists)
+                    info.Delete(true);
+                info.Create();
+            }))
+        {
+            Logger.Log(LogLevel.FAIL, "failed global initializing");
+            return;
+        }
+
+        Logger.Log(LogLevel.CMPL, "complete global initializing");
+
+        using (var razor = new RazorTemplateLinker(data))
+        {
+            if (!razor.Run())
+            {
+                Logger.Log(LogLevel.FAIL, "Failed to build project");
+                return;
+            }
+        }
+
+        Logger.Log(LogLevel.CMPL, "Complete building project");
+        
+        using (var google = new GoogleSitemapLinker(data))
+        {
+            if (!google.Run())
+            {
+                Logger.Log(LogLevel.FAIL, "Failed to build sitemap");
+                return;
+            }
+        }
+
+        Logger.Log(LogLevel.CMPL, "Complete building sitemap");
     }
 
     private static void Init(string name, string root)

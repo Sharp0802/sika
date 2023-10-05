@@ -1,12 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using BlogMan.Components;
+using BlogMan.Models.Posts;
 
 namespace BlogMan.Models;
 
 [Serializable]
 public partial class TemplateModel : IValidatableObject
 {
-    public TemplateModel(Project project, PostFrontMatter metadata, PostTree tree, string html)
+    public TemplateModel(Project project, PostFrontMatter metadata, PostRoot tree, string html)
     {
         Layout   = metadata.Layout;
         Metadata = metadata;
@@ -27,7 +28,7 @@ public partial class TemplateModel : IValidatableObject
 
     [Required] public Contacts Contacts { get; }
 
-    [Required] public PostTree PostTree { get; }
+    [Required] public PostRoot PostTree { get; }
 
     [Required(AllowEmptyStrings = true)] public string Html { get; }
 

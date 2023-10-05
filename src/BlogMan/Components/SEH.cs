@@ -29,31 +29,6 @@ public static class SEH
     }
 
     public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret)
-        where TReturn : struct
-    {
-        try
-        {
-            ret = io?.Invoke(target);
-            return true;
-        }
-        catch (IOException e)
-        {
-            Logger.Log(LogLevel.FAIL, $"IO operation failed: {e.Message}", target?.ToString() ?? "<null>");
-        }
-        catch (Exception e) when (e is SecurityException or UnauthorizedAccessException)
-        {
-            Logger.Log(LogLevel.FAIL, $"Unauthorized IO operation: {e.Message}", target?.ToString() ?? "<null>");
-        }
-        catch (Exception e)
-        {
-            Logger.Log(LogLevel.FAIL, e, target?.ToString() ?? "<null>");
-        }
-
-        Unsafe.SkipInit(out ret);
-        return false;
-    }
-
-    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret)
         where TReturn : class
     {
         try

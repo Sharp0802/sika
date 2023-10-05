@@ -17,6 +17,13 @@ public static class Preprocessor
 
     public static bool Compile(Project proj)
     {
+        if (!SEH.IO(proj.Info.BuildDirectory, dir =>
+            {
+                if (Directory.Exists(dir))
+                    Directory.Delete(dir, true);
+            })) 
+            return false;
+        
         var total   = 0;
         var success = 0;
         Logger.Log(LogLevel.INFO, "Preprocessing start", proj.Info.Name);

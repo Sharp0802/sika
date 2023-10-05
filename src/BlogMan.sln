@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlogMan", "BlogMan\BlogMan.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlogMan.Generator", "BlogMan.Generator\BlogMan.Generator.csproj", "{815C3F5F-8B43-496B-BE37-B7680C4FB58E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlogMan.Test", "BlogMan.Test\BlogMan.Test.csproj", "{725CA205-AA94-4E78-BC75-AF3FE6710CC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -34,5 +36,13 @@ Global
 		{815C3F5F-8B43-496B-BE37-B7680C4FB58E}.Debug|x64.Build.0 = Debug|Any CPU
 		{815C3F5F-8B43-496B-BE37-B7680C4FB58E}.Release|x64.ActiveCfg = Release|Any CPU
 		{815C3F5F-8B43-496B-BE37-B7680C4FB58E}.Release|x64.Build.0 = Release|Any CPU
+		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Debug|x86.Build.0 = Debug|Any CPU
+		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Release|x86.ActiveCfg = Release|Any CPU
+		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Release|x86.Build.0 = Release|Any CPU
+		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Debug|x64.Build.0 = Debug|Any CPU
+		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Release|x64.ActiveCfg = Release|Any CPU
+		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

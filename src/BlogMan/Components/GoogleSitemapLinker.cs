@@ -7,35 +7,39 @@ namespace BlogMan.Components;
 
 public sealed class GoogleSitemapLinker : LinkerBase
 {
-    private readonly object _sync = new();
-    private XElement? _root;
-    
+    private static XNamespace Xmlns => "http://www.sitemaps.org/schemas/sitemap/0.9";
+
+    private readonly object    _sync = new();
+    private          XElement? _root;
+
     public GoogleSitemapLinker(Project project) : base(project)
     {
     }
 
     protected override bool Initialize()
     {
-        _root = new XElement(
-            "urlset",
-            new XAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9")
-        );
+        _root = new XElement(Xmlns.GetName("urlset"));
         return true;
     }
 
     protected override bool Link(LinkerEventArgs args)
     {
-        var uri = new Uri(
-            new Uri(Project.Info.RootUri), 
-            Path.GetRelativePath(Project.Info.SiteDirectory, args.Destination.FullName));
-        var mod = args.PostNode.Metadata.Timestamps.Max();
-        
+        var href = args.PostNode.GetHRef();
+        if (href.StartsWith('/'))
+            href = href[1..];
+
+        var uri = new Uri(new Uri(Project.Info.RootUri), href);
+
+        var mod = args.PostNode.Metadata?.Timestamps.Max();
+        if (mod is null)
+            return false;
+
         lock (_sync)
         {
             _root!.Add(new XElement(
-                "url",
-                    new XElement("loc", uri),
-                    new XElement("lastmod", mod)
+                    Xmlns.GetName("url"),
+                    new XElement(Xmlns.GetName("loc"),     uri),
+                    new XElement(Xmlns.GetName("lastmod"), mod)
                 )
             );
         }
@@ -43,17 +47,21 @@ public sealed class GoogleSitemapLinker : LinkerBase
         return true;
     }
 
-    public override void Dispose()
+    protected override void CleanUp()
     {
         var xml = new XDocument(new XDeclaration("1.0", "UTF-8", null));
         xml.Add(_root);
-        
+
         var dst = Path.Combine(Project.Info.SiteDirectory, "sitemap.xml");
 
-        using var writer = new XmlTextWriter(dst, Encoding.UTF8);
-        writer.Formatting = Formatting.Indented;
-        writer.Indentation = 4;
+        using var stream = new FileStream(dst, FileMode.Create, FileAccess.Write);
+        using var writer = XmlWriter.Create(stream, new XmlWriterSettings
+        {
+            Encoding = Encoding.UTF8, 
+            Indent = true,
+            IndentChars = "\t"
+        });
         
-        xml.Save(writer);
+        xml.WriteTo(writer);
     }
 }
