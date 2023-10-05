@@ -10,6 +10,4 @@ namespace BlogMan.Contexts;
 [JsonSerializable(typeof(ProfileInfo))]
 [JsonSerializable(typeof(ProjectInfo))]
 [JsonSerializable(typeof(string))]
-public partial class SourceGenerationContext : JsonSerializerContext
-{
-}
+public partial class SourceGenerationContext : JsonSerializerContext;
