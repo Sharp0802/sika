@@ -21,17 +21,11 @@ using SIKA.Models.Utilities;
 
 namespace SIKA.Models.Posts;
 
-public abstract class PostTree : ITree<PostTree>
+public abstract class PostTree(FileSystemInfo? parent, FileSystemInfo current) : ITree<PostTree>
 {
-    protected PostTree[]? Children { get; private set; }
-    protected FileSystemInfo? Parent { get; }
-    protected FileSystemInfo Current { get; }
-
-    protected PostTree(FileSystemInfo? parent, FileSystemInfo current)
-    {
-        Parent = parent;
-        Current = current;
-    }
+    protected PostTree[]?     Children { get; private set; }
+    protected FileSystemInfo? Parent   { get; } = parent;
+    protected FileSystemInfo  Current  { get; } = current;
 
     public static PostRoot Burn(FileSystemTree fst)
     {
