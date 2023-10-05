@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Security;
 
@@ -5,11 +6,11 @@ namespace BlogMan.Components;
 
 public static class SEH
 {
-    public static bool IO<T>(T target, Action<T>? io)
+    public static bool IO<T>(T target, Action<T> io)
     {
         try
         {
-            io?.Invoke(target);
+            io.Invoke(target);
             return true;
         }
         catch (IOException e)
@@ -28,13 +29,13 @@ public static class SEH
         return false;
     }
 
-    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?>? io, out TReturn? ret)
+    public static bool IO<TSource, TReturn>(TSource target, Func<TSource, TReturn?> io, [NotNullWhen(true)] out TReturn? ret)
         where TReturn : class
     {
         try
         {
-            ret = io?.Invoke(target);
-            return true;
+            ret = io.Invoke(target);
+            return ret is not null;
         }
         catch (IOException)
         {
