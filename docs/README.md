@@ -7,7 +7,7 @@
 ![](https://img.shields.io/github/actions/workflow/status/Sharp0802/blogman/dotnet.yml?branch=master)
 ![](https://img.shields.io/github/repo-size/Sharp0802/blogman)
 
->> SIKA Is a Knowledge Archiver!
+> **S**IKA **I**s a **K**nowledge **A**rchiver!
 
 SIKA (formerly called as blogman) is a cross-platform static blog/note webpage generator, written in C#.
 
