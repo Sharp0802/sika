@@ -14,6 +14,6 @@ Topic: [
 
 ## Hello There!
 
-[test-link-1](ref::test0/test-post-1.md)
+[test-link-1](blogman://test0/align-0.md)
 
-[test-link-2](ref::test0/test1/test-post-2.md)
+[test-link-2](blogman://test0/test1/test-post-eee.md)

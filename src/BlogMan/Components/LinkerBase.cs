@@ -88,8 +88,8 @@ public abstract class LinkerBase : IDisposable
 
     private string OnVisitLink(LinkInline link)
     {
-        const string prefix = "ref::";
-        var          url    = link.UnescapedUrl.Text;
+        const string prefix = "blogman://";
+        var          url    = link.Url ?? string.Empty;
         return url.StartsWith(prefix) ? ManglingMap[url[prefix.Length..]] : url;
     }
 
