@@ -13,6 +13,7 @@
         <InvariantGlobalization>true</InvariantGlobalization>
         <Deterministic>false</Deterministic>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <LangVersion>12.0</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
