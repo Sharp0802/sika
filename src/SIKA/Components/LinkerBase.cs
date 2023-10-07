@@ -38,7 +38,7 @@ public abstract class LinkerBase : IDisposable
         Tree = PostTree.Burn(fst);
 
         ManglingMap = ((PostTree)Tree).Traverse().OfType<PostLeaf>().ToDictionary(
-            leaf => Path.GetRelativePath(project.Info.BuildDirectory, leaf.Info.FullName),
+            leaf => Path.GetRelativePath(project.Info.BuildDirectory, leaf.Info.FullName).Replace('\\', '/'),
             leaf => leaf.GetHRef()
         );
 
