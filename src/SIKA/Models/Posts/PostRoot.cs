@@ -35,6 +35,7 @@ public class PostRoot(FileSystemInfo? parent, FileSystemInfo current) : PostRoot
     {
         return Children
              ?.Order(PostTreeComparer.Default)
+              .Where(child => child is not PostLeaf leaf || !leaf.Info.Name.Equals("error.md", StringComparison.OrdinalIgnoreCase))
               .Select(child => child.GetHtml())
               .Aggregate(new StringBuilder(), (builder, html) => builder.AppendLine(html?.ToString()))
               .ToString()
