@@ -1,17 +1,17 @@
-//     Copyright (C) 2023  Yeong-won Seo
+// Copyright (C)  2023  Yeong-won Seo
 // 
-//     SIKA is free software: you can redistribute it and/or modify
-//     it under the terms of the GNU General Public License as published by
-//     the Free Software Foundation, either version 3 of the License, or
-//     (at your option) any later version.
+// SIKA is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-//     SIKA is distributed in the hope that it will be useful,
-//     but WITHOUT ANY WARRANTY; without even the implied warranty of
-//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//     GNU General Public License for more details.
+// SIKA is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
 // 
-//     You should have received a copy of the GNU General Public License
-//     along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License
+// along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
 
 using System.Diagnostics.CodeAnalysis;
 using sika.core.Model.Abstract;
@@ -27,10 +27,10 @@ public class PostMetadata(
     : ModelBase
 {
     internal PostMetadata(RawPostMetadata raw) : this(
-        raw.LCID, 
-        raw.Layout, 
-        raw.Title, 
-        raw.Timestamps.Select(DateTime.Parse).ToArray(), 
+        raw.LCID,
+        raw.Layout,
+        raw.Title,
+        raw.Timestamps.Select(DateTime.Parse).ToArray(),
         raw.Topic)
     {
     }

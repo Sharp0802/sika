@@ -1,4 +1,19 @@
-﻿using System.Text;
+﻿// Copyright (C)  2024  Yeong-won Seo
+// 
+// SIKA is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SIKA is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
+
+using System.Text;
 using sika.core.Components;
 using sika.core.Model;
 using sika.core.Text;
@@ -73,8 +88,8 @@ async Task<int> CreateProject(string[] args)
     sw.Write(data);
 
     siteDir.Create();
-    
-    
+
+
     layoutDir.Create();
     await File.WriteAllTextAsync("layout/default.cshtml", await ReadResourceAsync("sika.Resources.default.cshtml"));
 
@@ -105,8 +120,9 @@ async Task<int> BuildProject(string[] args)
         Console.Error.WriteLine("Couldn't load project file (sika.json). Is project file in correct format?");
         return -1;
     }
+
     project.InitializeDirectories(Path.GetDirectoryName(file.FullName)!);
-    
+
     var tree = new PageTree();
     await tree.PreprocessAsync(new DirectoryInfo(project.Info.PostDirectory), new YamlPreprocessor());
     await tree.LinkAsync(new RazorLinker(tree, project));
