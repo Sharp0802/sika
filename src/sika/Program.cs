@@ -43,7 +43,7 @@ switch (args[0])
 
 async Task<int> CreateProject(string[] args)
 {
-    if (args.Length < 1 || args[0] == "--help")
+    if (args.Length > 0)
     {
         await PrintHelp("sika.Resources.new-help.txt");
         return -1;
@@ -101,7 +101,7 @@ async Task<int> CreateProject(string[] args)
 
 async Task<int> BuildProject(string[] args)
 {
-    if (args.Length > 0 && args[0] == "--help")
+    if (args.Length > 0)
     {
         await PrintHelp("sika.Resources.build-help.txt");
         return -1;
