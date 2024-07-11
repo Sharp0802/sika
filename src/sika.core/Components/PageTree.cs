@@ -157,6 +157,8 @@ public class PageTree
             Console.WriteLine($"  [{i + 1}/{array.Length}] Link '{array[i].GetFullPath()}'");
             await linker.CompileAsync(array[i]);
         });
+        
+        (linker as IDisposable)?.Dispose();
     }
 
     public async Task WriteAsync(IWriter writer)
