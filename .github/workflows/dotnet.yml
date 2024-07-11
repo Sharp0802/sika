@@ -21,8 +21,8 @@ jobs:
         
     - name: Restore dependencies
       run: dotnet restore
-      working-directory: ./src/SIKA/
+      working-directory: ./src/sika/
       
     - name: Build
       run: dotnet build --no-restore
-      working-directory: ./src/SIKA/
+      working-directory: ./src/sika/
