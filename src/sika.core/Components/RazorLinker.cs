@@ -71,7 +71,7 @@ public class RazorLinker : ILinker
         var result = await _razorEngine.CompileRenderAsync(data.Metadata.Layout, new
         {
             Header   = new HeaderInfo(data.Metadata.Title, data.Metadata.Topic, data.Metadata.Timestamps),
-            PostTree = tree.GetRoot(),
+            PostTree = tree.GetRoot().GetHtml(_project),
             Html     = Markdown.ToHtml(data.Content, _pipeline),
             Uri      = _project.Info.RootUri,
 
@@ -98,6 +98,6 @@ public class RazorLinker : ILinker
         if (!_pageManglings.TryGetValue(target, out var url))
             throw new KeyNotFoundException($"page '{target}' not found");
 
-        return url;
+        return Path.ChangeExtension(url, ".html");
     }
 }

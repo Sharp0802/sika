@@ -15,6 +15,7 @@
 
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Xml.Linq;
 using sika.core.Components.Abstract;
 using sika.core.Model;
@@ -83,13 +84,13 @@ public class PageTree
             .ToDictionary(tree => tree.GetFullPath(), tree => root + tree.GetFullPath());
     }
 
-    internal XElement GetHtmlInternal()
+    private XElement GetHtmlInternal(Project project)
     {
         if (Content is PageLeafData leaf)
         {
             return new XElement("li",
                 new XElement("a",
-                    new XAttribute("href", $"/{GetFullPath()}.html"),
+                    new XAttribute("href", project.Info.RootUri + Path.ChangeExtension(GetFullPath(), ".html")),
                     new XText(leaf.Metadata.Title)));
         }
 
@@ -100,13 +101,17 @@ public class PageTree
             new XElement("ul",
                 Children
                     .OrderBy(tree => tree.Content.Name)
-                    .Select(child => child.GetHtmlInternal() as XObject)
+                    .Select(child => child.GetHtmlInternal(project) as XObject)
                     .Prepend(new XAttribute("class", "nested"))));
     }
 
-    public string GetHtml()
+    public string GetHtml(Project project)
     {
-        return GetHtmlInternal().ToString(SaveOptions.OmitDuplicateNamespaces);
+        return Children
+            .OrderBy(tree => tree.Content.Name)
+            .Select(child => child.GetHtmlInternal(project).ToString(SaveOptions.OmitDuplicateNamespaces))
+            .Aggregate(new StringBuilder(), (builder, s) => builder.AppendLine(s))
+            .ToString();
     }
 
     public async Task<bool> PreprocessAsync(DirectoryInfo source, IPreprocessor preprocessor)
