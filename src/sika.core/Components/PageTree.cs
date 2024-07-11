@@ -130,7 +130,7 @@ public class PageTree
         {
             var file = files[i];
 
-            Console.WriteLine($"[{i + 1}/{files.Length}] Preprocess '{file.FullName}'");
+            Console.WriteLine($"  [{i + 1}/{files.Length}] Preprocess '{file.FullName}'");
             var task = preprocessor.PreprocessAsync(file);
             _ = task.ContinueWith(
                 t => Children.Add(new PageTree(t.Result, this)),
@@ -149,12 +149,12 @@ public class PageTree
         return true;
     }
 
-    public Task LinkAsync(ILinker linker)
+    public async Task LinkAsync(ILinker linker)
     {
         var array = Traverse().Where(tree => tree.Content is PageLeafData).ToArray();
-        return Parallel.ForAsync(0, array.Length, async (i, _) =>
+        await Parallel.ForAsync(0, array.Length, async (i, _) =>
         {
-            Console.WriteLine($"[{i + 1}/{array.Length}] Link '{array[i].GetFullPath()}'");
+            Console.WriteLine($"  [{i + 1}/{array.Length}] Link '{array[i].GetFullPath()}'");
             await linker.CompileAsync(array[i]);
         });
     }

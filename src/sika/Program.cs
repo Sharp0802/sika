@@ -124,8 +124,13 @@ async Task<int> BuildProject(string[] args)
     project.InitializeDirectories(Path.GetDirectoryName(file.FullName)!);
 
     var tree = new PageTree();
+    Console.WriteLine("[1/4] Preprocess");
     await tree.PreprocessAsync(new DirectoryInfo(project.Info.PostDirectory), new YamlPreprocessor());
+    Console.WriteLine("[2/4] Link : RazorLinker");
     await tree.LinkAsync(new RazorLinker(tree, project));
+    Console.WriteLine("[3/4] Link : GoogleSitemapLinker");
+    await tree.LinkAsync(new GoogleSitemapLinker(project));
+    Console.WriteLine("[4/4] Write");
     await tree.WriteAsync(new FileSystemWriter(project));
 
     return 0;
