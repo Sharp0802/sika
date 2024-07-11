@@ -1,0 +1,7 @@
+Usage: sika new [<option>...] <name>
+
+Argument:
+<name> - a name of project
+
+Options:
+--help - prints this message

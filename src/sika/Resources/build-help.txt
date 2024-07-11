@@ -1,0 +1,4 @@
+Usage: sika build [<option>...]
+
+Options:
+--help - prints this message
