@@ -1,3 +1,18 @@
+// Copyright (C)  2024  Yeong-won Seo
+// 
+// SIKA is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// SIKA is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
+
 using System.Collections.Frozen;
 using Markdig;
 using Markdig.Extensions.AutoIdentifiers;
@@ -12,9 +27,9 @@ namespace sika.core.Components;
 
 public class RazorLinker : ILinker
 {
-    private readonly Project                          _project;
-    private readonly MarkdownPipeline                 _pipeline;
     private readonly FrozenDictionary<string, string> _pageManglings;
+    private readonly MarkdownPipeline                 _pipeline;
+    private readonly Project                          _project;
     private readonly RazorLightEngine                 _razorEngine;
 
     public RazorLinker(PageTree tree, Project project)
@@ -49,6 +64,25 @@ public class RazorLinker : ILinker
             .Build();
     }
 
+    public async Task CompileAsync(PageTree tree)
+    {
+        var data = (PageLeafData)tree.Content;
+
+        var result = await _razorEngine.CompileRenderAsync(data.Metadata.Layout, new
+        {
+            Header   = new HeaderInfo(data.Metadata.Title, data.Metadata.Topic, data.Metadata.Timestamps),
+            PostTree = tree.GetRoot(),
+            Html     = Markdown.ToHtml(data.Content, _pipeline),
+
+            // FOR BACK-COMPATIBILITY
+            data.Metadata.Layout,
+            data.Metadata,
+            _project.Profile,
+            _project.Contacts
+        });
+        data.Content = result;
+    }
+
     private string UrlRewriter(LinkInline arg)
     {
         if (arg.Url is null)
@@ -64,24 +98,5 @@ public class RazorLinker : ILinker
             throw new KeyNotFoundException($"page '{target}' not found");
 
         return url;
-    }
-
-    public async Task CompileAsync(PageTree tree)
-    {
-        var data = (PageLeafData)tree.Content;
-
-        var result = await _razorEngine.CompileRenderAsync(data.Metadata.Layout, new
-        {
-            Header   = new HeaderInfo(data.Metadata.Title, data.Metadata.Topic, data.Metadata.Timestamps),
-            PostTree = tree.GetRoot(),
-            Html     = Markdown.ToHtml(data.Content, _pipeline),
-
-            // FOR BACK-COMPATIBILITY
-            Layout   = data.Metadata.Layout,
-            Metadata = data.Metadata,
-            Profile  = _project.Profile,
-            Contacts = _project.Contacts
-        });
-        data.Content = result;
     }
 }

@@ -27,7 +27,7 @@ along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
     <link rel="defer" href="style/gfm-dark.css"/>
     <link rel="defer" href="style/post.css"/>
     <link rel="defer" href="style/hl-github-dark.min.css"/>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
     <script src="script/highlight.min.js" defer></script>
     <script src="script/defer-css.js" defer></script>
     <script src="script/treeview.js" defer></script>
@@ -42,11 +42,11 @@ along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
         <img alt="" id="profile-img" src="@Model.Profile.ProfileImage"/>
         <h3>@Model.Profile.UserName</h3>
         <ul id="contacts">
-            @if (!(Model.Contacts.GitHub is null))
+            @if (Model.Contacts.GitHub is not null)
             {
                 <li class="github-logo"><a href="@Model.Contacts.GitHub">GitHub Account</a></li>
             }
-            @if (!(Model.Contacts.Email is null))
+            @if (Model.Contacts.Email is not null)
             {
                 <li class="email-logo"><a href="mailto:@Model.Contacts.Email">Email</a></li>
             }
@@ -95,7 +95,6 @@ along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
 </header>
 
 <main id="article-main" class="markdown-body">
-
 @Html.Raw(Model.Html)
 </main>
 
