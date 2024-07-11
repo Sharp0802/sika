@@ -73,6 +73,7 @@ public class RazorLinker : ILinker
             Header   = new HeaderInfo(data.Metadata.Title, data.Metadata.Topic, data.Metadata.Timestamps),
             PostTree = tree.GetRoot(),
             Html     = Markdown.ToHtml(data.Content, _pipeline),
+            Uri      = _project.Info.RootUri,
 
             // FOR BACK-COMPATIBILITY
             data.Metadata.Layout,
