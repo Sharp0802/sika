@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIKA.Test", "SIKA.Test\SIKA.Test.csproj", "{725CA205-AA94-4E78-BC75-AF3FE6710CC0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sika.core", "sika.core\sika.core.csproj", "{8D42BD07-C4B9-44A9-9152-7491CA3D115D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sika", "sika\sika.csproj", "{4417F334-FA49-4C68-A7E6-0C22D2DBE4F4}"
@@ -20,14 +18,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Debug|x86.Build.0 = Debug|Any CPU
-		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Release|x86.ActiveCfg = Release|Any CPU
-		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Release|x86.Build.0 = Release|Any CPU
-		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Debug|x64.Build.0 = Debug|Any CPU
-		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Release|x64.ActiveCfg = Release|Any CPU
-		{725CA205-AA94-4E78-BC75-AF3FE6710CC0}.Release|x64.Build.0 = Release|Any CPU
 		{8D42BD07-C4B9-44A9-9152-7491CA3D115D}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{8D42BD07-C4B9-44A9-9152-7491CA3D115D}.Debug|x86.Build.0 = Debug|Any CPU
 		{8D42BD07-C4B9-44A9-9152-7491CA3D115D}.Release|x86.ActiveCfg = Release|Any CPU

@@ -69,7 +69,7 @@ along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
 
     <!-- TREE VIEW -->
     <ul id="tree-view">
-        @Raw(Model.PostTree.GetHtml())
+        @Html.Raw(Model.PostTree.GetHtml())
     </ul>
 </nav>
 
@@ -78,7 +78,7 @@ along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
     <ul id="date-log">
         @{
             bool first = true;
-            foreach (var date in Model.Metadata.RawTimestamps)
+            foreach (var date in Model.Metadata.Timestamps)
             {
                 if (first)
                 {
@@ -96,7 +96,7 @@ along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
 
 <main id="article-main" class="markdown-body">
 
-@Raw(Model.Html)
+@Html.Raw(Model.Html)
 </main>
 
 </body>
