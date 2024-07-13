@@ -19,9 +19,9 @@ using sika.core.Model;
 
 namespace sika.core.Components;
 
-public class FileSystemWriter(Project project) : IWriter
+public class FileSystemWriter(Project project) : ILinker
 {
-    public async Task WriteAsync(PageTree tree)
+    public async Task CompileAsync(PageTree tree)
     {
         var fullname = Path.Combine(project.Info.SiteDirectory, tree.GetFullPath());
 

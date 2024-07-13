@@ -13,7 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
 
-using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Xml.Linq;
@@ -114,45 +113,25 @@ public class PageTree
             .Aggregate(new StringBuilder(), (builder, s) => builder.AppendLine(s))
             .ToString();
     }
-
-    public async Task<bool> PreprocessAsync(DirectoryInfo source, IPreprocessor preprocessor)
+    
+    public void Initialize(DirectoryInfo source)
     {
-        var directories = source.GetDirectories();
-        var files       = source.GetFiles();
-
-        var tasks = ArrayPool<Task>.Shared.Rent(directories.Length + files.Length);
-
-        for (var i = 0; i < directories.Length; i++)
+        foreach (var fs in source.EnumerateFileSystemInfos())
         {
-            var node = new PageTree(new PageTreeData(directories[i].Name), this);
-            tasks[i] = node.PreprocessAsync(directories[i], preprocessor).ContinueWith(ret =>
+            PageTree tree = null!;
+            switch (fs)
             {
-                if (ret.Result)
-                    Children.Add(node);
-            });
+                case DirectoryInfo dir:
+                    tree = new PageTree(new PageTreeData(dir.Name), this);
+                    tree.Initialize(dir);
+                    break;
+                case FileInfo file:
+                    tree = new PageTree(new PageLeafData(file.Name, null!, File.ReadAllText(file.FullName)), this);
+                    break;
+            }
+
+            Children.Add(tree);
         }
-
-        for (var i = 0; i < files.Length; i++)
-        {
-            var file = files[i];
-
-            Console.WriteLine($"  [{i + 1}/{files.Length}] Preprocess '{file.FullName}'");
-            var task = preprocessor.PreprocessAsync(file);
-            _ = task.ContinueWith(
-                t => Children.Add(new PageTree(t.Result, this)),
-                TaskContinuationOptions.OnlyOnRanToCompletion);
-            _ = task.ContinueWith(
-                t => Console.WriteLine($"Preprocess failed: '{file.FullName}'\n{t.Exception}"),
-                TaskContinuationOptions.OnlyOnFaulted);
-            tasks[directories.Length + i] = task;
-        }
-
-        // array-pool may return array bigger than requested
-        await Task.WhenAll(tasks.Take(directories.Length + files.Length));
-
-        ArrayPool<Task>.Shared.Return(tasks);
-
-        return true;
     }
 
     public async Task LinkAsync(ILinker linker)
@@ -160,17 +139,18 @@ public class PageTree
         var array = Traverse().Where(tree => tree.Content is PageLeafData).ToArray();
         await Parallel.ForAsync(0, array.Length, async (i, _) =>
         {
-            Console.WriteLine($"  [{i + 1}/{array.Length}] Link '{array[i].GetFullPath()}'");
-            await linker.CompileAsync(array[i]);
+            Console.WriteLine($"  [{i + 1}/{array.Length}] {array[i].GetFullPath()}");
+            try
+            {
+                await linker.CompileAsync(array[i]);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"{linker.GetType().Name}: {e}");
+            }
         });
         
         (linker as IDisposable)?.Dispose();
-    }
-
-    public async Task WriteAsync(IWriter writer)
-    {
-        foreach (var node in Traverse())
-            await writer.WriteAsync(node);
     }
 }
 
@@ -182,5 +162,6 @@ public record PageLeafData(
     string       Content)
     : PageTreeData(Name)
 {
-    public string Content { get; set; } = Content;
+    public string       Content  { get; set; } = Content;
+    public PostMetadata Metadata { get; set; } = Metadata;
 }
