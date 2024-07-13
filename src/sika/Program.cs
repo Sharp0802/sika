@@ -136,7 +136,8 @@ async Task<int> BuildProject(string[] args)
     for (var i = 0; i < passes.Length; i++)
     {
         Console.WriteLine($"[{i + 1}/{passes.Length}] {passes[i].GetType().Name}");
-        await tree.LinkAsync(passes[i]);
+        if (!await tree.LinkAsync(passes[i]))
+            break;
     }
 
     return 0;
