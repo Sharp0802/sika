@@ -134,23 +134,31 @@ public class PageTree
         }
     }
 
-    public async Task LinkAsync(ILinker linker)
+    public async Task<bool> LinkAsync(ILinker linker)
     {
+        var lockHandle = new object();
+        var success    = true;
+        
         var array = Traverse().Where(tree => tree.Content is PageLeafData).ToArray();
         await Parallel.ForAsync(0, array.Length, async (i, _) =>
         {
-            Console.WriteLine($"  [{i + 1}/{array.Length}] {array[i].GetFullPath()}");
+            var fullname = array[i].GetFullPath();
+            Console.WriteLine($"  [{i + 1}/{array.Length}] {fullname}");
             try
             {
                 await linker.CompileAsync(array[i]);
             }
             catch (Exception e)
             {
-                Console.WriteLine($"{linker.GetType().Name}: {e}");
+                lock (lockHandle) 
+                    Console.Error.WriteLine($"{fullname}: {e}");
+                success = false;
             }
         });
         
         (linker as IDisposable)?.Dispose();
+
+        return success;
     }
 }
 
