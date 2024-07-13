@@ -108,6 +108,7 @@ public class PageTree
     public string GetHtml(Project project)
     {
         return Children
+            .Where(tree => !tree.Content.Name.Equals("404.md"))
             .OrderBy(tree => tree.Content.Name)
             .Select(child => child.GetHtmlInternal(project).ToString(SaveOptions.OmitDuplicateNamespaces))
             .Aggregate(new StringBuilder(), (builder, s) => builder.AppendLine(s))
