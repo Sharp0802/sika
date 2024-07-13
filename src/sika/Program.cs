@@ -15,6 +15,7 @@
 
 using System.Text;
 using sika.core.Components;
+using sika.core.Components.Abstract;
 using sika.core.Model;
 using sika.core.Text;
 
@@ -124,14 +125,19 @@ async Task<int> BuildProject(string[] args)
     project.InitializeDirectories(Path.GetDirectoryName(file.FullName)!);
 
     var tree = new PageTree();
-    Console.WriteLine("[1/4] Preprocess");
-    await tree.PreprocessAsync(new DirectoryInfo(project.Info.PostDirectory), new YamlPreprocessor());
-    Console.WriteLine("[2/4] Link : RazorLinker");
-    await tree.LinkAsync(new RazorLinker(tree, project));
-    Console.WriteLine("[3/4] Link : GoogleSitemapLinker");
-    await tree.LinkAsync(new GoogleSitemapLinker(project));
-    Console.WriteLine("[4/4] Write");
-    await tree.WriteAsync(new FileSystemWriter(project));
+    tree.Initialize(new DirectoryInfo(project.Info.PostDirectory));
+
+    ILinker[] passes = [
+        new YamlPreprocessor(),
+        new RazorLinker(tree, project),
+        new GoogleSitemapLinker(project),
+        new FileSystemWriter(project)
+    ];
+    for (var i = 0; i < passes.Length; i++)
+    {
+        Console.WriteLine($"[{i + 1}/{passes.Length}] {passes[i].GetType().Name}");
+        await tree.LinkAsync(passes[i]);
+    }
 
     return 0;
 }
