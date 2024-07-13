@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU General Public License
 // along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
 
-using System.Text;
 using Markdig;
 using Markdig.Extensions.Yaml;
 using Markdig.Syntax;
 using sika.core.Components.Abstract;
 using sika.core.Model;
 using sika.core.Text;
+using YamlDotNet.Core;
 
 namespace sika.core.Components;
 
@@ -44,9 +44,16 @@ public class YamlPreprocessor : ILinker
             .Split('\n')
             .Skip(1)
             .SkipLast(1));
-
-        if (new Yaml().Deserialize<PostMetadata.RawPostMetadata>(yamlText) is not { } rawMetadata)
-            throw new FileLoadException("metadata cannot be serialized");
+        
+        PostMetadata.RawPostMetadata rawMetadata;
+        try
+        {
+            rawMetadata = new Yaml().Deserialize<PostMetadata.RawPostMetadata>(yamlText);
+        }
+        catch (YamlException e)
+        {
+            throw new FileLoadException($"Couldn't deserialize yaml:\n--- DUMP ---{yamlText}\n--- END ---", e);
+        }
 
         leafData.Content  = leafData.Content.Remove(yaml.Span.Start, yaml.Span.Length);
         leafData.Metadata = new PostMetadata(rawMetadata);
