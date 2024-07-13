@@ -21,10 +21,13 @@ namespace sika.core.Text;
 
 public class Yaml : ITextFormat
 {
-    private static readonly ISerializer Serializer =
+    [ThreadStatic] private static ISerializer?   _serializer;
+    [ThreadStatic] private static IDeserializer? _deserializer;
+
+    private static ISerializer Serializer => _serializer ??=
         new SerializerBuilder().WithNamingConvention(NullNamingConvention.Instance).Build();
 
-    private static readonly IDeserializer Deserializer =
+    private static IDeserializer Deserializer => _deserializer ??=
         new DeserializerBuilder().WithNamingConvention(NullNamingConvention.Instance).Build();
 
     public string Serialize<T>(T data) where T : class
@@ -32,7 +35,7 @@ public class Yaml : ITextFormat
         return Serializer.Serialize(data, typeof(T));
     }
 
-    public T? Deserialize<T>(string data) where T : class
+    public T Deserialize<T>(string data) where T : class
     {
         return Deserializer.Deserialize<T>(data);
     }
