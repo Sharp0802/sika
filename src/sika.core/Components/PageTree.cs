@@ -16,6 +16,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Xml.Linq;
+using Microsoft.CodeAnalysis.CSharp;
 using sika.core.Components.Abstract;
 using sika.core.Model;
 
@@ -139,8 +140,23 @@ public class PageTree
         var lockHandle = new object();
         var success    = true;
         
-        var array = Traverse().Where(tree => tree.Content is PageLeafData).ToArray();
-        await Parallel.ForAsync(0, array.Length, async (i, _) =>
+        var array = Traverse().Where(linker.CanExecute).ToArray();
+        
+        if (linker.IsSynchronous)
+        {
+            for (var i = 0; i < array.Length; ++i)
+                VisitNodeAsync(i).GetAwaiter().GetResult();
+        }
+        else
+        {
+            await Parallel.ForAsync(0, array.Length, async (i, _) => await VisitNodeAsync(i));
+        }
+        
+        (linker as IDisposable)?.Dispose();
+
+        return success;
+
+        async Task VisitNodeAsync(int i)
         {
             var fullname = array[i].GetFullPath();
             Console.WriteLine($"  [{i + 1}/{array.Length}] {fullname}");
@@ -154,11 +170,7 @@ public class PageTree
                     Console.Error.WriteLine($"{fullname}: {e}");
                 success = false;
             }
-        });
-        
-        (linker as IDisposable)?.Dispose();
-
-        return success;
+        }
     }
 }
 
