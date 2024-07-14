@@ -57,18 +57,11 @@ async Task<int> CreateProject(string[] args)
     var data = new Json().Serialize(project);
 
     var file      = new FileInfo("sika.json");
-    var siteDir   = new DirectoryInfo("site");
     var layoutDir = new DirectoryInfo("layout");
     var postDir   = new DirectoryInfo("post");
     if (file.Exists)
     {
         Console.Error.WriteLine("Couldn't create project: There is already project file (sika.json)");
-        return -1;
-    }
-
-    if (siteDir.Exists)
-    {
-        Console.Error.WriteLine("Couldn't create folder: There is already site folder (site/)");
         return -1;
     }
 
@@ -87,9 +80,6 @@ async Task<int> CreateProject(string[] args)
     await using var fs = file.OpenWrite();
     await using var sw = new StreamWriter(fs, Encoding.UTF8);
     sw.Write(data);
-
-    siteDir.Create();
-
 
     layoutDir.Create();
     await File.WriteAllTextAsync("layout/default.cshtml", await ReadResourceAsync("sika.Resources.default.cshtml"));
@@ -127,7 +117,8 @@ async Task<int> BuildProject(string[] args)
     var tree = new PageTree();
     tree.Initialize(new DirectoryInfo(project.Info.PostDirectory));
 
-    ILinker[] passes = [
+    ILinker[] passes =
+    [
         new YamlPreprocessor(),
         new RazorLinker(tree, project),
         new GoogleSitemapLinker(project),
