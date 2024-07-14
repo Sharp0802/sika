@@ -19,15 +19,26 @@ using sika.core.Model;
 
 namespace sika.core.Components;
 
-public class FileSystemWriter(Project project) : ILinker
+public class FileSystemWriter : ILinker, IDisposable
 {
+    private readonly Project _project;
+
+    public FileSystemWriter(Project project)
+    {
+        _project = project;
+
+        var siteDir = new DirectoryInfo(_project.Info.SiteDirectory);
+        if (!siteDir.Exists)
+            siteDir.Create();
+    }
+
     public bool IsSynchronous => true;
-    
+
     public bool CanExecute(PageTree tree) => true;
-    
+
     public async Task CompileAsync(PageTree tree)
     {
-        var fullname = Path.Combine(project.Info.SiteDirectory, tree.GetFullPath());
+        var fullname = Path.Combine(_project.Info.SiteDirectory, tree.GetFullPath());
 
         if (tree.Content is PageLeafData leaf)
         {
@@ -42,5 +53,21 @@ public class FileSystemWriter(Project project) : ILinker
             if (!dir.Exists)
                 dir.Create();
         }
+    }
+
+    public void Dispose()
+    {
+        var siteDir = new DirectoryInfo(_project.Info.SiteDirectory);
+        CopyDirectory(new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot")), siteDir);
+    }
+
+    private static void CopyDirectory(DirectoryInfo source, DirectoryInfo destination)
+    {
+        if (!destination.Exists)
+            destination.Create();
+        foreach (var file in source.EnumerateFiles())
+            file.CopyTo(Path.Combine(destination.FullName, file.Name), true);
+        foreach (var sub in source.EnumerateDirectories())
+            CopyDirectory(sub, destination.CreateSubdirectory(sub.Name));
     }
 }
