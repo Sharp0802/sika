@@ -6,9 +6,25 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PreserveCompilationContext>true</PreserveCompilationContext>
+
+        <AssemblyVersion>3.0.0</AssemblyVersion>
+        
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>sika</ToolCommandName>
+        <PackageOutputPath>./bin/nupkg</PackageOutputPath>
+        
+        <PackageId>sika</PackageId>
+        <Description>Cross-platform static site generator with markdown</Description>
+        <PackageVersion>$(AssemblyVersion)</PackageVersion>
+        <Authors>Sharp0802</Authors>
+        <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/Sharp0802/sika</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="../../docs/README.md" Pack="true" PackagePath=""/>
+        
         <EmbeddedResource Include="Resources\build-help.txt"/>
         <EmbeddedResource Include="Resources\help.txt"/>
         <EmbeddedResource Include="Resources\new-help.txt"/>
@@ -21,9 +37,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="wwwroot/**">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <None Update="wwwroot/**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>
