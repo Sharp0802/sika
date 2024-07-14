@@ -64,6 +64,13 @@ public class RazorLinker : ILinker
             .Build();
     }
 
+    public bool IsSynchronous => false;
+
+    public bool CanExecute(PageTree tree)
+    {
+        return tree.Content is PageLeafData;
+    }
+
     public async Task CompileAsync(PageTree tree)
     {
         var data = (PageLeafData)tree.Content;

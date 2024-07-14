@@ -32,6 +32,13 @@ public class GoogleSitemapLinker(Project project) : ILinker, IDisposable
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + urlSet.ToString(SaveOptions.OmitDuplicateNamespaces));
     }
 
+    public bool IsSynchronous => false;
+    
+    public bool CanExecute(PageTree tree)
+    {
+        return tree.Content is PageLeafData;
+    }
+
     public Task CompileAsync(PageTree tree)
     {
         var loc     = project.Info.RootUri + tree.GetFullPath();

@@ -30,6 +30,13 @@ public class YamlPreprocessor : ILinker
         .UseYamlFrontMatter()
         .Build();
 
+    public bool IsSynchronous => false;
+
+    public bool CanExecute(PageTree tree)
+    {
+        return tree.Content is PageLeafData;
+    }
+
     public Task CompileAsync(PageTree tree)
     {
         var leafData = (PageLeafData)tree.Content;

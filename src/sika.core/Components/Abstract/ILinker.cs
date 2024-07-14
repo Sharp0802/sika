@@ -17,5 +17,9 @@ namespace sika.core.Components.Abstract;
 
 public interface ILinker
 {
+    public bool IsSynchronous { get; }
+    
+    public bool CanExecute(PageTree tree);
+    
     public Task CompileAsync(PageTree tree);
 }
