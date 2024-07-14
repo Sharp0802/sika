@@ -19,9 +19,6 @@ using sika.core.Components.Abstract;
 using sika.core.Model;
 using sika.core.Text;
 
-typeof(Program).Assembly.GetManifestResourceStream("sika.Resources.build-help.txt");
-typeof(Program).Assembly.GetManifestResourceStream("sika.Resources.new-help.txt");
-
 if (args.Length < 1)
 {
     await PrintHelp("sika.Resources.help.txt");
@@ -30,12 +27,15 @@ if (args.Length < 1)
 
 switch (args[0])
 {
-    case "new":
-        return await CreateProject(args[1..]);
     case "build":
         return await BuildProject(args[1..]);
     case "help":
         await PrintHelp("sika.Resources.help.txt");
+        return 0;
+    case "new":
+        return await CreateProject(args[1..]);
+    case "version":
+        Console.WriteLine($"sika {typeof(Program).Assembly.GetName().Version!.ToString(3)}");
         return 0;
     default:
         await PrintHelp("sika.Resources.help.txt");
@@ -137,7 +137,7 @@ async Task<int> BuildProject(string[] args)
     {
         Console.WriteLine($"[{i + 1}/{passes.Length}] {passes[i].GetType().Name}");
         if (!await tree.LinkAsync(passes[i]))
-            break;
+            return -1;
     }
 
     return 0;

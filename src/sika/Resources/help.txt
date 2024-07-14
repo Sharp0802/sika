@@ -1,6 +1,7 @@
 Usage: sika <subcommand>
 
 Subcommands:
-help  - prints this message
-new   - create new project
-build - build project
+build   - build project
+help    - prints this message
+new     - create new project
+version - display version information
