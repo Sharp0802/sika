@@ -7,7 +7,7 @@
         <Nullable>enable</Nullable>
         <PreserveCompilationContext>true</PreserveCompilationContext>
 
-        <AssemblyVersion>3.0.2</AssemblyVersion>
+        <AssemblyVersion>3.0.3</AssemblyVersion>
         
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>sika</ToolCommandName>
