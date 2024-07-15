@@ -15,8 +15,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Web;
 using System.Xml.Linq;
-using Microsoft.CodeAnalysis.CSharp;
 using sika.core.Components.Abstract;
 using sika.core.Model;
 
@@ -56,13 +56,16 @@ public class PageTree
         }
     }
 
-    internal string GetFullPath()
+    internal string GetFullPath(bool isHRef = false)
     {
         var stack = new Stack<string>();
         var tree  = this;
         do
         {
-            stack.Push(tree.Content.Name);
+            var name      = tree.Content.Name;
+            if (isHRef) 
+                name = HttpUtility.UrlEncode(name);
+            stack.Push(name);
             tree = tree.Parent;
         } while (tree?.Parent != null);
 
@@ -81,16 +84,17 @@ public class PageTree
     {
         return Traverse()
             .Where(tree => tree.Content is PageLeafData)
-            .ToDictionary(tree => tree.GetFullPath(), tree => root + tree.GetFullPath());
+            .ToDictionary(tree => tree.GetFullPath(), tree => root + tree.GetFullPath(true));
     }
 
     private XElement GetHtmlInternal(Project project)
     {
         if (Content is PageLeafData leaf)
         {
+            var path = Path.ChangeExtension(GetFullPath(true), ".html");
             return new XElement("li",
                 new XElement("a",
-                    new XAttribute("href", project.Info.RootUri + Path.ChangeExtension(GetFullPath(), ".html")),
+                    new XAttribute("href", project.Info.RootUri + path),
                     new XText(leaf.Metadata.Title)));
         }
 
