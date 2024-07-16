@@ -21,80 +21,87 @@ along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
 <html lang="@Model.Data.Metadata.LCID">
 
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta name="keywords" content="@(string.Join(',', Model.Data.Metadata.Topic))"/>
-    <title>@Model.Data.Metadata.Title</title>
-    <link rel="defer" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" />
-    <link rel="defer" href="@(Model.Project.Info.RootUri)style/gfm-dark.css"/>
-    <link rel="defer" href="@(Model.Project.Info.RootUri)style/post.css"/>
-    <link rel="defer" href="@(Model.Project.Info.RootUri)style/hl-github-dark.min.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
-    <script src="@(Model.Project.Info.RootUri)script/highlight.min.js" defer></script>
-    <script src="@(Model.Project.Info.RootUri)script/defer-css.js" defer></script>
-    <script src="@(Model.Project.Info.RootUri)script/treeview.js" defer></script>
-    <script src="@(Model.Project.Info.RootUri)script/search.js" defer></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="keywords" content="@(string.Join(',', Model.Data.Metadata.Topic))"/>
+  <title>@Model.Data.Metadata.Title</title>
+  <link rel="defer" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"/>
+  <link rel="defer" href="@(Model.Project.Info.RootUri)style/gfm-dark.css"/>
+  <link rel="defer" href="@(Model.Project.Info.RootUri)style/post.css"/>
+  <link rel="defer" href="@(Model.Project.Info.RootUri)style/hl-github-dark.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+  <script src="@(Model.Project.Info.RootUri)script/highlight.min.js" defer></script>
+  <script src="@(Model.Project.Info.RootUri)script/defer-css.js" defer></script>
+  <script src="@(Model.Project.Info.RootUri)script/treeview.js" defer></script>
+  <script src="@(Model.Project.Info.RootUri)script/search.js" defer></script>
 </head>
 
 <body>
 
 <nav class="sidenav">
-    <!-- PROFILE -->
-    <section id="profile">
-        <img alt="" id="profile-img" src="@Model.Project.Profile.ProfileImage"/>
-        <h3>@Model.Project.Profile.UserName</h3>
-        <ul id="contacts">
-            <li class="github-logo"><a href="@Model.Project.Contacts.GitHub">GitHub Account</a></li>
-            <li class="email-logo"><a href="mailto:@Model.Project.Contacts.Email">Email</a></li>
-            @foreach (var link in Model.Project.Contacts.Misc)
-            {
-                <li class="email-logo"><a href="@link.HRef">@link.Name</a></li>
-            }
-        </ul>
-    </section>
-
-    <br/>
-
-    <!-- SEARCH FORM -->
-    <form role="search" id="search-form">
-        <svg viewBox="0 0 1024 1024">
-            <path d="M848.471 928l-263.059-263.059c-48.941 36.706-110.118 55.059-177.412 55.059-171.294 0-312-140.706-312-312s140.706-312 312-312c171.294 0 312 140.706 312 312 0 67.294-24.471 128.471-55.059 177.412l263.059 263.059-79.529 79.529zM189.623 408.078c0 121.364 97.091 218.455 218.455 218.455s218.455-97.091 218.455-218.455c0-121.364-103.159-218.455-218.455-218.455-121.364 0-218.455 97.091-218.455 218.455z"/>
-        </svg>
-        <input id="search-box" type="text" placeholder="Search"/>
-    </form>
-
-    <!-- TREE VIEW -->
-    <ul id="tree-view">
-        @Raw(Model.PostTree)
+  <!-- PROFILE -->
+  <section id="profile">
+    <img alt="" id="profile-img" src="@Model.Project.Profile.ProfileImage"/>
+    <h3>@Model.Project.Profile.UserName</h3>
+    <ul id="contacts">
+      <li class="github-logo">
+        <a href="@Model.Project.Contacts.GitHub">GitHub Account</a>
+      </li>
+      <li class="email-logo">
+        <a href="mailto:@Model.Project.Contacts.Email">Email</a>
+      </li>
+      @foreach (var link in Model.Project.Contacts.Misc)
+      {
+        <li class="email-logo">
+          <a href="@link.HRef">@link.Name</a>
+        </li>
+      }
     </ul>
+  </section>
+
+  <br/>
+
+  <!-- SEARCH FORM -->
+  <form role="search" id="search-form">
+    <svg viewBox="0 0 1024 1024">
+      <path d="M848.471 928l-263.059-263.059c-48.941 36.706-110.118 55.059-177.412 55.059-171.294 0-312-140.706-312-312s140.706-312 312-312c171.294 0 312 140.706 312 312 0 67.294-24.471 128.471-55.059 177.412l263.059 263.059-79.529 79.529zM189.623 408.078c0 121.364 97.091 218.455 218.455 218.455s218.455-97.091 218.455-218.455c0-121.364-103.159-218.455-218.455-218.455-121.364 0-218.455 97.091-218.455 218.455z"/>
+    </svg>
+    <input id="search-box" type="text" placeholder="Search"/>
+  </form>
+
+  <!-- TREE VIEW -->
+  <ul id="tree-view">
+    @Raw(Model.PostTree)
+  </ul>
 </nav>
 
 <header id="article-header">
-    <h1>@Model.Data.Metadata.Title</h1>
-    <ul id="date-log">
-        @{
-            bool first = true;
-            foreach (var date in Model.Data.Metadata.Timestamps)
-            {
-                var strDate = date.ToString("yyyy-MM-dd");
-                if (first)
-                {
-                    <li>Created @strDate</li>
-                }
-                else
-                {
-                    <li>Updated @strDate</li>
-                }
-                first = false;
-            }
+  <h1>@Model.Data.Metadata.Title</h1>
+  <ul id="date-log">
+    @{
+      bool first = true;
+      foreach (var date in Model.Data.Metadata.Timestamps)
+      {
+        var strDate = date.ToString("yyyy-MM-dd");
+        if (first)
+        {
+          <li>Created @strDate</li>
         }
-    </ul>
+        else
+        {
+          <li>Updated @strDate</li>
+        }
+
+        first = false;
+      }
+    }
+  </ul>
 </header>
 
 <main id="article-main" class="markdown-body">
-@Raw(Model.Data.Content)
+  @Raw(Model.Data.Content)
 </main>
 
 </body>
 
-</html> 
+</html>
