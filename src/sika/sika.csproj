@@ -30,6 +30,7 @@
         <EmbeddedResource Include="Resources\new-help.txt"/>
         <EmbeddedResource Include="Resources\welcome.txt"/>
         <EmbeddedResource Include="Resources\default.cshtml"/>
+        <EmbeddedResource Include="Resources\material.cshtml"/>
     </ItemGroup>
 
     <ItemGroup>
