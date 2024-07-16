@@ -74,20 +74,11 @@ public class RazorLinker : ILinker
     public async Task CompileAsync(PageTree tree)
     {
         var data = (PageLeafData)tree.Content;
-
-        var result = await _razorEngine.CompileRenderAsync(data.Metadata.Layout, new
-        {
-            Header   = new HeaderInfo(data.Metadata.Title, data.Metadata.Topic, data.Metadata.Timestamps),
-            PostTree = tree.GetRoot().GetHtml(_project),
-            Html     = Markdown.ToHtml(data.Content, _pipeline),
-            Uri      = _project.Info.RootUri,
-
-            // FOR BACK-COMPATIBILITY
+        data.Content = Markdown.ToHtml(data.Content, _pipeline);
+        
+        var result = await _razorEngine.CompileRenderAsync(
             data.Metadata.Layout,
-            data.Metadata,
-            _project.Profile,
-            _project.Contacts
-        });
+            new TemplateModel(_project, tree));
         data.Content = result;
     }
 
