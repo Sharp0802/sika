@@ -1,0 +1,291 @@
+/* 
+ * Copyright (C)  2024  Yeong-won Seo
+ *
+ * SIKA is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * SIKA is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with SIKA.  If not, see <https://www.gnu.org/licenses/>. 
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+:root {
+    --on-primary: #fff;
+    --primary-surface: #f8f1f6;
+    --background: #fefbff;
+    --disabled: #5f6368;
+
+    --navbar: #f2ecee;
+    --navbar-width: 320px;
+
+    --treeview-item: #d6cbcf33;
+
+    --radius: 24px;
+}
+
+body {
+    height: 100vh;
+    margin: 0;
+    background-color: var(--background);
+
+    font-family: 'Space Grotesk', 'Noto Sans JP', 'Noto Sans KR', sans-serif;
+}
+
+nav.side {
+    margin: 0;
+    padding: 0;
+    width: var(--navbar-width);
+    position: fixed;
+    height: 100vh;
+    overflow: auto;
+
+    left: 0;
+    transition: left 0.5s ease-in-out;
+
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background-color: var(--navbar);
+    overflow-y: hidden;
+}
+
+nav.top {
+    position: fixed;
+    top: calc(-48px - 16px);
+    width: calc(100% - 48px);
+
+    height: 0;
+    padding: 0;
+    background-color: var(--on-primary);
+    display: flex;
+    align-items: center;
+    align-content: space-between;
+    font-size: 18.5px;
+
+    transition: top 0.5s ease-in-out;
+}
+
+nav.top > div {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    align-content: space-between;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+nav.top .profile {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+article {
+    height: 100vh;
+    margin-left: var(--navbar-width);
+    padding: 10px;
+}
+
+.card {
+    background-color: var(--primary-surface);
+    border-radius: var(--radius);
+    padding: 56px;
+}
+
+.card * {
+    margin: 0;
+}
+
+header h3 {
+    float: right;
+    font-weight: normal;
+    font-size: min(1em, 6vw);
+    color: var(--disabled);
+}
+
+h1 {
+    font-size: min(8vw, 4em);
+    font-weight: 475;
+}
+
+.side-container {
+    padding: 10px;
+    height: calc(100% - 20px);
+    overflow-y: hidden;
+
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
+.side-container > .card {
+    padding: 0;
+}
+
+.side-container .profile {
+    width: 100%;
+    border-radius: var(--radius);
+}
+
+
+#contacts {
+    list-style: none;
+    margin: 0;
+    padding: 10px 25px 25px 25px;
+}
+
+#contacts li {
+    height: 21px;
+}
+
+#contacts > li {
+    margin-bottom: 10px;
+}
+
+#contacts > li:nth-child(2),
+#contacts > li:nth-child(4) {
+    margin-bottom: -8px;
+}
+
+#contacts a,
+#contacts a:hover,
+#contacts a:visited {
+    color: inherit;
+    text-decoration: none;
+}
+
+#contacts li .icon {
+    display: inline-block;
+    font-size: 21px;
+    height: 21px;
+    width: 32px;
+}
+
+
+.contact-entry {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.contact-entry > li {
+    display: block;
+    float: left;
+}
+
+#profile-container {
+    flex: 0 1 auto;
+}
+
+#tree-view-container {
+    flex: 1 1 auto;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#tree-view {
+    padding: 10px;
+    list-style-type: none;
+}
+
+#tree-view a,
+#tree-view a:hover,
+#tree-view a:visited {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#tree-view ul {
+    list-style-type: none;
+    margin: 0;
+    padding-left: 20px;
+}
+
+#tree-view li {
+    border-radius: 20px;
+    padding: 10px 0 10px 20px;
+}
+
+#tree-view li > div {
+    height: 20px;
+    width: calc(100% - 0.6em);
+}
+
+#tree-view li:hover {
+    background-color: var(--treeview-item);
+}
+
+.caret {
+    display: block;
+    cursor: pointer;
+    user-select: none;
+    width: 100%;
+}
+
+.caret::after {
+    font-size: 0.6em;
+    margin-right: 20px;
+    display: block;
+    content: "\25B6";
+    color: black;
+    float: right;
+}
+
+.caret-down::after {
+    transform: rotate(90deg);
+}
+
+.nested {
+    display: none;
+}
+
+.active {
+    display: block;
+}
+
+#footer {
+    text-align: center;
+    color: var(--disabled)
+}
+
+
+@media screen and (max-width: 900px) {
+    nav.side {
+        left: calc(-1 * var(--navbar-width));
+        height: calc(100vh - 48px - 16px);
+    }
+
+    nav.side.vis {
+        visibility: visible;
+        width: var(--navbar-width) !important;
+        left: 0;
+        box-shadow: 3px 0 3px rgba(0, 0, 0, 0.2);
+    }
+
+    nav.top {
+        visibility: visible;
+        height: 48px;
+        padding: 8px 24px;
+        top: 0;
+    }
+
+    .card {
+        padding: min(36px, 8vw);
+    }
+
+    article {
+        margin-top: calc(48px + 16px);
+        margin-left: 0;
+    }
+}
