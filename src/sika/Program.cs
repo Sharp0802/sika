@@ -82,7 +82,12 @@ async Task<int> CreateProject(string[] args)
     sw.Write(data);
 
     layoutDir.Create();
-    await File.WriteAllTextAsync("layout/default.cshtml", await ReadResourceAsync("sika.Resources.default.cshtml"));
+    
+    foreach (var cshtml in typeof(Program).Assembly.GetManifestResourceNames().Where(s => s.EndsWith(".cshtml")))
+    {
+        var filename = cshtml[(cshtml.LastIndexOf('.', cshtml.Length - 8) + 1)..];
+        await File.WriteAllTextAsync($"layout/{filename}", await ReadResourceAsync(cshtml));
+    }
 
     postDir.Create();
     await File.WriteAllTextAsync("post/index.md", await ReadResourceAsync("sika.Resources.welcome.txt"));
