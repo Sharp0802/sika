@@ -15,23 +15,25 @@ You should have received a copy of the GNU General Public License
 along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
+@model sika.core.Model.TemplateModel
+
 <!DOCTYPE html>
-<html lang="@Model.Metadata.LCID">
+<html lang="@Model.Data.Metadata.LCID">
 
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta name="keywords" content="@(string.Join(',', Model.Header.Topics))"/>
-    <title>@Model.Header.Title</title>
+    <meta name="keywords" content="@(string.Join(',', Model.Data.Metadata.Topic))"/>
+    <title>@Model.Data.Metadata.Title</title>
     <link rel="defer" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" />
-    <link rel="defer" href="@(Model.Uri)style/gfm-dark.css"/>
-    <link rel="defer" href="@(Model.Uri)style/post.css"/>
-    <link rel="defer" href="@(Model.Uri)style/hl-github-dark.min.css"/>
+    <link rel="defer" href="@(Model.Project.Info.RootUri)style/gfm-dark.css"/>
+    <link rel="defer" href="@(Model.Project.Info.RootUri)style/post.css"/>
+    <link rel="defer" href="@(Model.Project.Info.RootUri)style/hl-github-dark.min.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
-    <script src="@(Model.Uri)script/highlight.min.js" defer></script>
-    <script src="@(Model.Uri)script/defer-css.js" defer></script>
-    <script src="@(Model.Uri)script/treeview.js" defer></script>
-    <script src="@(Model.Uri)script/search.js" defer></script>
+    <script src="@(Model.Project.Info.RootUri)script/highlight.min.js" defer></script>
+    <script src="@(Model.Project.Info.RootUri)script/defer-css.js" defer></script>
+    <script src="@(Model.Project.Info.RootUri)script/treeview.js" defer></script>
+    <script src="@(Model.Project.Info.RootUri)script/search.js" defer></script>
 </head>
 
 <body>
@@ -39,18 +41,12 @@ along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
 <nav class="sidenav">
     <!-- PROFILE -->
     <section id="profile">
-        <img alt="" id="profile-img" src="@Model.Profile.ProfileImage"/>
-        <h3>@Model.Profile.UserName</h3>
+        <img alt="" id="profile-img" src="@Model.Project.Profile.ProfileImage"/>
+        <h3>@Model.Project.Profile.UserName</h3>
         <ul id="contacts">
-            @if (Model.Contacts.GitHub is not null)
-            {
-                <li class="github-logo"><a href="@Model.Contacts.GitHub">GitHub Account</a></li>
-            }
-            @if (Model.Contacts.Email is not null)
-            {
-                <li class="email-logo"><a href="mailto:@Model.Contacts.Email">Email</a></li>
-            }
-            @foreach (var link in Model.Contacts.Misc)
+            <li class="github-logo"><a href="@Model.Project.Contacts.GitHub">GitHub Account</a></li>
+            <li class="email-logo"><a href="mailto:@Model.Project.Contacts.Email">Email</a></li>
+            @foreach (var link in Model.Project.Contacts.Misc)
             {
                 <li class="email-logo"><a href="@link.HRef">@link.Name</a></li>
             }
@@ -74,19 +70,20 @@ along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
 </nav>
 
 <header id="article-header">
-    <h1>@Model.Header.Title</h1>
+    <h1>@Model.Data.Metadata.Title</h1>
     <ul id="date-log">
         @{
             bool first = true;
-            foreach (var date in Model.Metadata.Timestamps)
+            foreach (var date in Model.Data.Metadata.Timestamps)
             {
+                var strDate = date.ToString("yyyy-MM-dd");
                 if (first)
                 {
-                    <li>Created @date</li>
+                    <li>Created @strDate</li>
                 }
                 else
                 {
-                    <li>Updated @date</li>
+                    <li>Updated @strDate</li>
                 }
                 first = false;
             }
@@ -95,7 +92,7 @@ along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
 </header>
 
 <main id="article-main" class="markdown-body">
-@Raw(Model.Html)
+@Raw(Model.Data.Content)
 </main>
 
 </body>
