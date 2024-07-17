@@ -1,19 +1,21 @@
-<!--
-Copyright (C) 2023  Yeong-won Seo
-
-SIKA is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-SIKA is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
--->
+@{
+  /*
+   * Copyright (C) 2024  Yeong-won Seo
+   *
+   * SIKA is free software: you can redistribute it and/or modify
+   * it under the terms of the GNU General Public License as published by
+   * the Free Software Foundation, either version 3 of the License, or
+   * (at your option) any later version.
+   *
+   * SIKA is distributed in the hope that it will be useful,
+   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   * GNU General Public License for more details.
+   *
+   * You should have received a copy of the GNU General Public License
+   * along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
+   */
+}
 
 @model sika.core.Model.TemplateModel
 
@@ -29,6 +31,8 @@ along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
   <script src="@(Model.Project.Info.RootUri)script/highlight.min.js" defer></script>
 
+  <link rel="stylesheet" href="@(Model.Project.Info.RootUri)style/github-markdown-light.css"/>
+  <link rel="stylesheet" href="@(Model.Project.Info.RootUri)style/hl-github.min.css"/>
   <link rel="stylesheet" href="@(Model.Project.Info.RootUri)style/material.css"/>
 
   <title>@Model.Data.Metadata.Title</title>
@@ -120,10 +124,11 @@ along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
       <h1>@Model.Data.Metadata.Title</h1>
       <h3>Last edit on @Model.Data.Metadata.Timestamps.Last().ToString("yyyy-MM-dd")</h3>
     </header>
-
-    <p class="markdown-body">
-      @Raw(Model.Data.Content)
-    </p>
+    <div class="content">
+      <div class="markdown-body">
+        @Raw(Model.Data.Content)
+      </div>
+    </div>
   </main>
 </article>
 
