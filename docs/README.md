@@ -7,11 +7,9 @@
 ![](https://img.shields.io/github/actions/workflow/status/Sharp0802/blogman/dotnet.yml?branch=master)
 ![](https://img.shields.io/github/repo-size/Sharp0802/blogman)
 
-> **S**IKA **I**s a **K**nowledge **A**rchiver!
-
 SIKA (formerly called as blogman) is a cross-platform static blog/note webpage generator, written in C#.
 
-## FEATURES
+## Features
 
 - Implemented with pure C#
 - GitHub flavoured Markdown support
@@ -19,12 +17,16 @@ SIKA (formerly called as blogman) is a cross-platform static blog/note webpage g
 - Google xml sitemap support
 - Highly configurable
 
-## GETTING STARTED
+## Getting started
 
 See [wiki](https://github.com/Sharp0802/blogman/wiki/Getting-Started).
 
-## PREVIEW
+## Preview
 
-![](img/screenshot.png)
+![image](https://github.com/user-attachments/assets/9afb102e-a617-4176-99e1-5fbd67c46989)
+
+|                                      Pane closed                                      |                                     Pane opened                                      |
+|:-------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------:|
+| ![](https://github.com/user-attachments/assets/2f3d0541-ff82-4bc9-8e86-0c3588217967)  | ![](https://github.com/user-attachments/assets/2c38eadb-9d69-45f9-9f50-af62a46ecaf6) |
 
 - My [blog](https://sharp0802.github.io) generated with `sika`.
