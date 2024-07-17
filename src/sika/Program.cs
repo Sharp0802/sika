@@ -51,9 +51,11 @@ async Task<int> CreateProject(string[] args)
     }
 
     var project = new Project(
-        new ProjectInfo("https://example.com", "post", "layout", "site"),
-        new ProfileInfo("<username>", "<profile-image>"),
-        new Contacts("<github-link>", "<your-email>", []));
+        new ProjectInfo("https://blog.sharp0802.com/", "post", "layout", "site"),
+        new ProfileInfo("Sharp0802", "https://github.com/Sharp0802.png", "I'm ..."),
+        new Contacts("https://github.com/Sharp0802", "syw0802@proton.me", [ 
+            new LinkReference("https://www.linkedin.com/in/%EC%98%81%EC%9B%90-%EC%84%9C-aa289627a/", "in/영원-서-aa289627a") 
+        ]));
     var data = new Json().Serialize(project);
 
     var file      = new FileInfo("sika.json");
