@@ -19,8 +19,9 @@ using sika.core.Model.Abstract;
 namespace sika.core.Model;
 
 [method: JsonConstructor]
-public class ProfileInfo(string userName, string profileImage) : ModelBase
+public class ProfileInfo(string userName, string profileImage, string bio) : ModelBase
 {
     public string UserName     { get; set; } = userName;
     public string ProfileImage { get; set; } = profileImage;
+    public string Bio          { get; set; } = bio;
 }
