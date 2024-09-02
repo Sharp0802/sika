@@ -10,7 +10,7 @@
         <PackageReference Include="Markdig" Version="0.37.0"/>
         <PackageReference Include="MarkdigExtensions.UrlRewriter" Version="1.0.0"/>
         <PackageReference Include="RazorLight" Version="2.3.1"/>
-        <PackageReference Include="YamlDotNet" Version="16.0.0"/>
+        <PackageReference Include="YamlDotNet" Version="16.1.0"/>
     </ItemGroup>
 
 </Project>
