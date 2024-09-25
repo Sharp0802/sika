@@ -26,3 +26,10 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
       working-directory: ./src/sika/
+
+    - name: Publish to NuGet
+      uses: brandedoutcast/publish-nuget@v2.5.2
+      with:
+        PROJECT_FILE_PATH: "src/sika/sika.csproj"
+        NUGET_KEY: ${{secrets.NUGET_KEY}}
+      if: github.event_name != 'pull_request'
