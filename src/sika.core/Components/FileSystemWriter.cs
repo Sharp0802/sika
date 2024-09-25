@@ -38,7 +38,9 @@ public class FileSystemWriter : ILinker, IDisposable
 
     public async Task CompileAsync(PageTree tree)
     {
-        var fullname = Path.Combine(_project.Info.SiteDirectory, tree.GetFullPath());
+        var path = tree.GetFullPath().Replace(' ', '+');
+        
+        var fullname = Path.Combine(_project.Info.SiteDirectory, path);
 
         if (tree.Content is PageLeafData leaf)
         {
