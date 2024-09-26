@@ -37,19 +37,12 @@ jobs:
         VERSION_REGEX: '<AssemblyVersion>(.*)<\/AssemblyVersion>'
         NUGET_KEY: ${{secrets.NUGET_KEY}}
       if: github.event_name != 'pull_request'
-
-    - name: Retrieve version
-      id: proj_version
-      uses: KageKirin/get-csproj-version@v0
-      with:
-        file: src/sika/sika.csproj
-        xpath: '//PropertyGroup/AssemblyVersion'
       
     - name: Create release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        VERSION: ${{ steps.proj_version.version }}
       run: |
-        gh release create "v$VERSION" \
+        version="$(grep '<AssemblyVersion>' src/sika/sika.csproj | grep -oE '([0-9]+\.){2}[0-9]+')"
+        gh release create "v$version" \
           --repo="$GITHUB_REPOSITORY" \
           --generate-notes
