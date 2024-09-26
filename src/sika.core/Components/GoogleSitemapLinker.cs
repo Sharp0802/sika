@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with SIKA.  If not, see <https://www.gnu.org/licenses/>.
 
+using System.Collections.Concurrent;
 using System.Xml.Linq;
 using sika.core.Components.Abstract;
 using sika.core.Model;
@@ -21,12 +22,12 @@ namespace sika.core.Components;
 
 public class GoogleSitemapLinker(Project project) : ILinker, IDisposable
 {
-    private readonly List<XObject> _urls = [];
-    private readonly XNamespace    _ns   = "http://www.sitemaps.org/schemas/sitemap/0.9";
+    private readonly ConcurrentBag<XElement> _urls = [];
+    private readonly XNamespace              _ns   = "http://www.sitemaps.org/schemas/sitemap/0.9";
 
     public void Dispose()
     {
-        var urlSet = new XElement(_ns + "urlset", _urls);
+        var urlSet = new XElement(_ns + "urlset", _urls.OrderBy(url => url.Attribute("loc")!.Value));
         File.WriteAllText(
             Path.Combine(project.Info.SiteDirectory, "sitemap.xml"), 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + urlSet.ToString(SaveOptions.OmitDuplicateNamespaces));
