@@ -46,3 +46,4 @@ jobs:
         gh release create "v$version" \
           --repo="$GITHUB_REPOSITORY" \
           --generate-notes
+      if: github.event_name != 'pull_request'
