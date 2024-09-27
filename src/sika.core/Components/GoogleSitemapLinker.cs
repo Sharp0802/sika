@@ -27,7 +27,7 @@ public class GoogleSitemapLinker(Project project) : ILinker, IDisposable
 
     public void Dispose()
     {
-        var urlSet = new XElement(_ns + "urlset", _urls.OrderBy(url => url.Attribute(_ns + "loc")!.Value));
+        var urlSet = new XElement(_ns + "urlset", _urls.OrderBy(url => url.Element(_ns + "loc")!.Value));
         File.WriteAllText(
             Path.Combine(project.Info.SiteDirectory, "sitemap.xml"), 
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + urlSet.ToString(SaveOptions.OmitDuplicateNamespaces));
